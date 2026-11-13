@@ -218,6 +218,15 @@ export default function AdminRolesPage() {
                 <strong>(3) Phòng Ban Chuyên Môn</strong> bảo mật dữ liệu nhạy cảm giữa các bộ phận.
               </p>
             </div>
+
+            {/* Watermark Logo Quê Nhà Thật */}
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-25 pointer-events-none hidden md:block">
+              <img
+                src="/logo-oval-transparent.png"
+                alt="Logo Quê Nhà"
+                className="w-56 object-contain brightness-200 contrast-125"
+              />
+            </div>
           </div>
 
           {/* SƠ ĐỒ KIM TỰ THÁP 6 CẤP BẬC HIERARCHY */}

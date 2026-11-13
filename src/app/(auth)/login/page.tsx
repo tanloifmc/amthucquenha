@@ -47,16 +47,25 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#FBF9F5] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        {/* Logo Quê Nhà */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#8B1D24] text-white font-black text-2xl shadow-md mb-4 border border-[#72161C]">
-          QN
+        {/* Logo Quê Nhà Thật */}
+        <div className="flex flex-col items-center justify-center mb-4">
+          <div className="relative mb-3">
+            <img
+              src="/logo-round.png"
+              alt="Logo Ẩm Thực Quê Nhà"
+              className="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-[#C58940] ring-4 ring-[#8B1D24]/10"
+            />
+          </div>
+          <h1 className="text-2xl font-black text-[#8B1D24] tracking-tight uppercase">
+            Ẩm Thực Quê Nhà
+          </h1>
+          <p className="mt-1 text-xs text-[#C58940] font-serif italic font-bold tracking-wider">
+            ~ Không gian ẩm thực Việt ~
+          </p>
+          <p className="mt-0.5 text-[11px] text-[#6B5E55] font-semibold tracking-wide uppercase">
+            Hệ Thống Quản Trị Vận Hành & CRM Tiệc
+          </p>
         </div>
-        <h1 className="text-2xl font-black text-[#8B1D24] tracking-tight uppercase">
-          Ẩm Thực Quê Nhà
-        </h1>
-        <p className="mt-1 text-xs text-[#6B5E55] font-semibold tracking-wide uppercase">
-          Hệ Thống Quản Trị Vận Hành & CRM Tiệc
-        </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">

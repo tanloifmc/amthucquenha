@@ -138,9 +138,12 @@ export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
         {/* Brand Header */}
         <div className="h-16 border-b border-[#E8E2D9] px-5 flex items-center justify-between bg-[#FAF7F2]">
           <Link href="/dashboard" className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-lg bg-[#8B1D24] text-white flex items-center justify-center font-bold text-base shadow-xs">
-              QN
-            </div>
+            {/* Real Official Brand Logo */}
+            <img
+              src="/logo-round.png"
+              alt="Logo Ẩm Thực Quê Nhà"
+              className="w-10 h-10 rounded-full object-cover shadow-sm border border-[#C58940]/60 ring-2 ring-[#8B1D24]/10 shrink-0"
+            />
             <div>
               <div className="text-sm font-extrabold text-[#8B1D24] tracking-tight leading-none">
                 ẨM THỰC QUÊ NHÀ

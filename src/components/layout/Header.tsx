@@ -44,6 +44,12 @@ export function Header({ user, onOpenSidebar, onSwitchUser }: HeaderProps) {
           <Menu className="w-5 h-5" />
         </button>
 
+        <img
+          src="/logo-round.png"
+          alt="Quê Nhà"
+          className="w-8 h-8 rounded-full border border-[#C58940]/50 lg:hidden shadow-xs shrink-0"
+        />
+
         {/* Branch Selector */}
         <BranchSelector user={user} />
       </div>
