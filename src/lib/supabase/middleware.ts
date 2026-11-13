@@ -30,10 +30,23 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Quan trọng: Không chặn code trước getUser để tránh session bị out-of-sync
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Kiểm tra cookie session giả lập / demo trước
+  const mockUserCookie = request.cookies.get('quenha_mock_user');
+  let hasValidSession = !!mockUserCookie?.value;
+
+  // Nếu không có mock cookie thì kiểm tra Supabase Auth
+  if (!hasValidSession && supabaseKey !== 'dummy_anon_key') {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        hasValidSession = true;
+      }
+    } catch {
+      // Bỏ qua lỗi kết nối Supabase ở môi trường dev local
+    }
+  }
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login');
   const isProtectedRoute =
@@ -41,18 +54,20 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/admin') ||
     request.nextUrl.pathname.startsWith('/crm') ||
     request.nextUrl.pathname.startsWith('/marketing') ||
-    request.nextUrl.pathname.startsWith('/floor');
+    request.nextUrl.pathname.startsWith('/floor') ||
+    request.nextUrl.pathname.startsWith('/finance') ||
+    request.nextUrl.pathname.startsWith('/operations');
 
   // Nếu chưa đăng nhập và cố vào trang nội bộ
-  if (!user && isProtectedRoute) {
+  if (!hasValidSession && isProtectedRoute) {
     // Lưu lại URL gốc để sau khi đăng nhập chuyển hướng lại
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('returnUrl', request.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Nếu đã đăng nhập mà lại vào trang /login
-  if (user && isAuthRoute) {
+  // Nếu đã đăng nhập mà lại vào trang /login (trừ khi có query switch=true)
+  if (hasValidSession && isAuthRoute && !request.nextUrl.searchParams.has('switch')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

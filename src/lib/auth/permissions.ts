@@ -485,7 +485,7 @@ export const TEST_PROFILES: Record<string, UserProfile> = {
   hdtv: {
     id: 'user-hdtv-01',
     email: 'hdtv@quenha.vn',
-    full_name: 'Nguyễn Văn Lợi (Chủ Đầu Tư / HĐTV)',
+    full_name: 'Thành Viên Hội Đồng Thành Viên',
     level: 1,
     role_code: 'HDTV',
     role_name: 'Hội Đồng Thành Viên',
@@ -503,7 +503,7 @@ export const TEST_PROFILES: Record<string, UserProfile> = {
   super_admin: {
     id: 'user-cto-01',
     email: 'cto@quenha.vn',
-    full_name: 'Kỹ Sư Trưởng Hệ Thống (CTO / Admin)',
+    full_name: 'Super Admin / Giám Đốc Công Nghệ',
     level: 2,
     role_code: 'SUPER_ADMIN',
     role_name: 'Super Admin',
@@ -521,7 +521,7 @@ export const TEST_PROFILES: Record<string, UserProfile> = {
   dept_head_mkt: {
     id: 'user-mkt-head-01',
     email: 'tp_mkt@quenha.vn',
-    full_name: 'Lê Thu Trang (Trưởng Phòng Marketing)',
+    full_name: 'Trưởng Phòng Marketing & Truyền Thông',
     level: 3,
     role_code: 'DEPARTMENT_HEAD',
     role_name: 'Trưởng Phòng HQ',
@@ -539,7 +539,7 @@ export const TEST_PROFILES: Record<string, UserProfile> = {
   general_manager: {
     id: 'user-gm-01',
     email: 'gm@quenha.vn',
-    full_name: 'Vũ Đức Thành (Tổng Quản Lý Chuỗi)',
+    full_name: 'Tổng Quản Lý Vận Hành Chuỗi (GM)',
     level: 4,
     role_code: 'GENERAL_MANAGER',
     role_name: 'Tổng Quản Lý',
@@ -557,7 +557,7 @@ export const TEST_PROFILES: Record<string, UserProfile> = {
   branch_manager: {
     id: 'user-bm-01',
     email: 'ql_pnt@quenha.vn',
-    full_name: 'Trần Minh Đức (Quản lý QN Phạm Ngọc Thạch)',
+    full_name: 'Quản Lý Nhà Hàng / Chi Nhánh (RM)',
     level: 5,
     role_code: 'BRANCH_MANAGER',
     role_name: 'Quản lý Chi Nhánh',
@@ -573,7 +573,7 @@ export const TEST_PROFILES: Record<string, UserProfile> = {
   staff_sales: {
     id: 'user-sales-01',
     email: 'sales_tt@quenha.vn',
-    full_name: 'Phạm Hoàng Nam (Sales Đặt Tiệc)',
+    full_name: 'Nhân Viên Tư Vấn Đặt Tiệc (Banquet Sales)',
     level: 6,
     role_code: 'STAFF',
     role_name: 'Nhân Viên Vận Hành',
@@ -595,7 +595,7 @@ TEST_PROFILES.sales_staff = TEST_PROFILES.staff_sales;
 TEST_PROFILES.accountant = {
   id: 'user-acc-01',
   email: 'ketoan@quenha.vn',
-  full_name: 'Đặng Mai Phương (Kế toán Tổng hợp)',
+  full_name: 'Kế Toán Đối Soát Tiệc & Ngân Hàng',
   level: 6,
   role_code: 'STAFF',
   role_name: 'Kế toán Tài chính',

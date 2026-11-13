@@ -16,12 +16,16 @@ interface UserRecord {
   is_active: boolean;
 }
 
-const INITIAL_USERS: UserRecord[] = Object.values(TEST_PROFILES).map((p, idx) => ({
+const uniqueProfiles = Array.from(
+  new Map(Object.values(TEST_PROFILES).map((p) => [p.id, p])).values()
+);
+
+const INITIAL_USERS: UserRecord[] = uniqueProfiles.map((p, idx) => ({
   id: p.id,
-  full_name: p.full_name,
+  full_name: p.job_title_name || p.full_name,
   email: p.email || `nhanvien${idx + 1}@quenha.vn`,
   phone: '0903.xxx.xxx',
-  role_name: p.role_name,
+  role_name: `L${p.level || 1} • ${p.role_name}`,
   department_name: p.department_name || 'Vận hành',
   branch_names: p.is_all_branches ? ['Toàn chuỗi (3 chi nhánh)'] : p.branches.map((b) => b.name),
   is_active: true,

@@ -75,7 +75,7 @@ export default function ExecutiveDashboardPage() {
             <span>Trung Tâm Điều Hành Ban Giám Đốc (Executive Command Center)</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Kính chào Ban Giám Đốc, {currentUser.full_name}!
+            Kính chào {currentUser.job_title_name || currentUser.role_name}!
           </h1>
           <p className="text-white/80 text-sm mt-2 leading-relaxed">
             Dữ liệu tổng hợp thời gian thực từ 3 chi nhánh (Phạm Ngọc Thạch, Thành Thái, Nguyễn Thái Bình). Hệ thống đã tự động đối soát với sổ kế toán MISA SME.

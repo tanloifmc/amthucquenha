@@ -136,19 +136,19 @@ export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
         }`}
       >
         {/* Brand Header */}
-        <div className="h-16 border-b border-[#E8E2D9] px-5 flex items-center justify-between bg-[#FAF7F2]">
+        <div className="h-16 border-b border-[#E8E2D9] px-4 flex items-center justify-between bg-[#FAF7F2]">
           <Link href="/dashboard" className="flex items-center space-x-2.5">
-            {/* Real Official Brand Logo */}
+            {/* Real Official Brand Logo - Dáng Oval Tự Nhiên Không Bo Tròn */}
             <img
-              src="/logo-round.png"
+              src="/logo-oval-transparent.png"
               alt="Logo Ẩm Thực Quê Nhà"
-              className="w-10 h-10 rounded-full object-cover shadow-sm border border-[#C58940]/60 ring-2 ring-[#8B1D24]/10 shrink-0"
+              className="h-9 sm:h-10 w-auto object-contain shrink-0 drop-shadow-xs"
             />
             <div>
-              <div className="text-sm font-extrabold text-[#8B1D24] tracking-tight leading-none">
+              <div className="text-xs font-black text-[#8B1D24] tracking-tight leading-none uppercase">
                 ẨM THỰC QUÊ NHÀ
               </div>
-              <div className="text-[10px] text-[#6B5E55] font-medium tracking-wide uppercase mt-1">
+              <div className="text-[9px] text-[#6B5E55] font-bold tracking-wider uppercase mt-1">
                 CRM & Quản Trị Nội Bộ
               </div>
             </div>
@@ -228,18 +228,18 @@ export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
           })}
         </div>
 
-        {/* User Card footer */}
+        {/* User Card footer - Chỉ hiển thị Chức Danh & Cấp Bậc (Không để tên cá nhân) */}
         <div className="p-3 border-t border-[#E8E2D9] bg-[#FAF7F2]">
-          <div className="flex items-center space-x-3 px-2 py-1.5">
-            <div className="w-8 h-8 rounded-full bg-[#8B1D24]/10 text-[#8B1D24] flex items-center justify-center font-bold text-xs border border-[#8B1D24]/20">
-              {user.full_name.charAt(0)}
+          <div className="flex items-center space-x-2.5 px-1 py-1">
+            <div className="w-8 h-8 rounded-lg bg-[#8B1D24] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+              L{user.level || 1}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[#231F20] truncate">
-                {user.full_name}
+                {user.job_title_name || user.role_name}
               </div>
               <div className="text-[10px] text-[#6B5E55] truncate font-medium">
-                {user.role_name}
+                {user.role_name} • {user.department_name}
               </div>
             </div>
           </div>
