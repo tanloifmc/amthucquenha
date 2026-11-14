@@ -107,6 +107,7 @@ export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
       subItems: [
         { title: 'Chi nhánh', href: '/admin/branches' },
         { title: 'Phòng ban', href: '/admin/departments' },
+        { title: 'Thực đơn & Menu tiệc', href: '/admin/menu' },
         { title: 'Người dùng', href: '/admin/users' },
         { title: 'Phân quyền & Chức danh', href: '/admin/roles' },
       ],

@@ -255,4 +255,35 @@ export const crmService = {
   async getDepositsByBookingId(bookingId: number): Promise<DepositRecord[]> {
     return INITIAL_DEPOSITS.filter((d) => d.booking_id === bookingId);
   },
+
+  // Thêm đơn đặt tiệc mới (từ Landing Page online hoặc Sales)
+  async addBooking(booking: Partial<BookingRecord>): Promise<BookingRecord> {
+    const newId = INITIAL_BOOKINGS.length + 1;
+    const newBooking: BookingRecord = {
+      id: newId,
+      booking_code: booking.booking_code || `BK-202611-${String(newId).padStart(3, '0')}`,
+      customer_id: booking.customer_id || 999,
+      customer_code: booking.customer_code || formatCustomerCode(booking.customer_phone || ''),
+      customer_name: booking.customer_name || 'Khách Đặt Online',
+      customer_phone: booking.customer_phone || '',
+      company_name: booking.company_name || '',
+      branch_id: booking.branch_id || 1,
+      branch_name: booking.branch_name || 'Chi Nhánh Quê Nhà',
+      event_type: booking.event_type || 'TIEC_THAN_MAT',
+      event_type_label: booking.event_type_label || 'Tiệc Thân Mật',
+      booking_date: booking.booking_date || new Date().toISOString().split('T')[0],
+      time_slot: booking.time_slot || 'DINNER',
+      guest_count: booking.guest_count || 10,
+      room_name: booking.room_name || 'Chưa gán phòng (Chờ TQL duyệt)',
+      table_room_id: booking.table_room_id || 0,
+      estimated_budget: booking.estimated_budget || 0,
+      total_deposited: 0,
+      stage: 'NEW',
+      sales_rep_name: 'Tiếp Nhận Online',
+      special_requests: booking.special_requests || '',
+      created_at: new Date().toISOString().split('T')[0],
+    };
+    INITIAL_BOOKINGS.unshift(newBooking);
+    return newBooking;
+  },
 };

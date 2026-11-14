@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Menu, LogOut, UserCheck } from 'lucide-react';
+import { Menu, LogOut, UserCheck, ExternalLink } from 'lucide-react';
 import { UserProfile, TEST_PROFILES } from '@/lib/auth/permissions';
 import { BranchSelector } from './BranchSelector';
 import { useRouter } from 'next/navigation';
@@ -100,6 +100,17 @@ export function Header({ user, onOpenSidebar, onSwitchUser }: HeaderProps) {
       </div>
 
       <div className="flex items-center space-x-3">
+        {/* Nút Xem Trang Đặt Tiệc Khách */}
+        <a
+          href="/"
+          target="_blank"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D5C7B5] bg-[#FAF7F2] text-[#8B1D24] hover:bg-[#F2ECE3] text-xs font-semibold transition-colors"
+          title="Mở Trang Đặt Tiệc Khách & Bot AI"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          <span>Trang Đặt Tiệc</span>
+        </a>
+
         {/* Nút Chuyển nhanh vai trò để test kiểm tra chéo theo chi nhánh */}
         <div className="relative">
           <button
