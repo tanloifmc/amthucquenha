@@ -33,6 +33,7 @@ const INITIAL_USERS: UserRecord[] = uniqueProfiles.map((p, idx) => ({
 
 export default function AdminUsersPage() {
   const [usersList, setUsersList] = useState<UserRecord[]>(INITIAL_USERS);
+  const [selectedBranchFilter, setSelectedBranchFilter] = useState<'all' | 'HQ' | 'QN_PNT' | 'QN_TT' | 'QN_NTB'>('all');
   const [showModal, setShowModal] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -41,6 +42,15 @@ export default function AdminUsersPage() {
   const [departmentName, setDepartmentName] = useState('Phòng Marketing & Truyền thông');
   const [branchOption, setBranchOption] = useState('Quê Nhà - Phạm Ngọc Thạch');
   const [notification, setNotification] = useState<string | null>(null);
+
+  const filteredUsers = usersList.filter((u) => {
+    if (selectedBranchFilter === 'all') return true;
+    if (selectedBranchFilter === 'HQ') return u.branch_names.some((b) => b.includes('Toàn chuỗi'));
+    if (selectedBranchFilter === 'QN_PNT') return u.branch_names.some((b) => b.includes('Phạm Ngọc Thạch'));
+    if (selectedBranchFilter === 'QN_TT') return u.branch_names.some((b) => b.includes('Thành Thái'));
+    if (selectedBranchFilter === 'QN_NTB') return u.branch_names.some((b) => b.includes('Nguyễn Thái Bình'));
+    return true;
+  });
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +75,14 @@ export default function AdminUsersPage() {
     setNotification(`Đã tạo tài khoản nhân viên: ${newUser.full_name} (${newUser.role_name})`);
     setTimeout(() => setNotification(null), 4000);
   };
+
+  const branchFilterTabs = [
+    { id: 'all', name: 'Tất Cả Nhân Sự' },
+    { id: 'HQ', name: '🏢 Trụ Sở HQ' },
+    { id: 'QN_PNT', name: '📍 Phạm Ngọc Thạch' },
+    { id: 'QN_TT', name: '📍 Thành Thái' },
+    { id: 'QN_NTB', name: '📍 Nguyễn Thái Bình' },
+  ];
 
   return (
     <div className="min-h-screen bg-[#FBF9F5] text-[#231F20]">
@@ -91,7 +109,7 @@ export default function AdminUsersPage() {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center px-3.5 py-2 rounded-lg bg-[#8B1D24] text-white text-xs font-bold hover:bg-[#72161C] shadow-xs transition-colors"
+            className="inline-flex items-center px-3.5 py-2 rounded-lg bg-[#8B1D24] text-white text-xs font-bold hover:bg-[#72161C] shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Thêm nhân viên
@@ -100,9 +118,9 @@ export default function AdminUsersPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         {notification && (
-          <div className="mb-6 p-4 rounded-lg bg-[#EAF5EC] border border-[#2A7238] text-[#2A7238] flex items-center justify-between text-sm font-medium">
+          <div className="p-4 rounded-lg bg-[#EAF5EC] border border-[#2A7238] text-[#2A7238] flex items-center justify-between text-sm font-medium">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5" />
               <span>{notification}</span>
@@ -110,21 +128,44 @@ export default function AdminUsersPage() {
           </div>
         )}
 
+        {/* BỘ LỌC CHI NHÁNH TRỰC QUAN */}
+        <div className="flex items-center gap-2 p-1 bg-white border border-[#E8E2D9] rounded-xl shadow-xs overflow-x-auto">
+          {branchFilterTabs.map((tab) => {
+            const isActive = selectedBranchFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setSelectedBranchFilter(tab.id as any)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? 'bg-[#8B1D24] text-white shadow-xs'
+                    : 'text-[#6B5E55] hover:text-[#231F20] hover:bg-[#FAF7F2]'
+                }`}
+              >
+                {tab.name}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="bg-white rounded-xl border border-[#E8E2D9] overflow-hidden shadow-xs">
-          <div className="px-6 py-4 border-b border-[#E8E2D9] bg-[#FAF7F2]">
-            <h2 className="text-base font-bold text-[#231F20]">
-              Danh Sách Nhân Viên & Ma Trận Phân Quyền ({usersList.length} tài khoản)
-            </h2>
-            <p className="text-xs text-[#6B5E55] mt-0.5">
-              Mỗi nhân viên được gán 1 Phòng ban, 1 Vai trò cốt lõi và các Chi nhánh phụ trách cụ thể.
-            </p>
+          <div className="px-6 py-4 border-b border-[#E8E2D9] bg-[#FAF7F2] flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-[#231F20]">
+                Danh Sách Nhân Viên & Cấp Bậc ({filteredUsers.length} tài khoản)
+              </h2>
+              <p className="text-xs text-[#6B5E55] mt-0.5">
+                Cơ chế 3 Tổng Quản Lý độc lập cho 3 Chi Nhánh, kèm Quản lý ca trực (Sáng/Tối) và nhân viên thực thi.
+              </p>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-[#E8E2D9] text-left text-sm">
               <thead className="bg-[#FAF7F2] text-xs uppercase font-bold text-[#6B5E55]">
                 <tr>
-                  <th className="px-6 py-3">Nhân Viên</th>
+                  <th className="px-6 py-3">Nhân Viên / Chức Danh</th>
                   <th className="px-6 py-3">Phòng Ban</th>
                   <th className="px-6 py-3">Vai Trò</th>
                   <th className="px-6 py-3">Chi Nhánh Phụ Trách</th>
@@ -132,7 +173,7 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E8E2D9] bg-white">
-                {usersList.map((u) => (
+                {filteredUsers.map((u) => (
                   <tr key={u.id} className="hover:bg-[#FBF9F5] transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-[#231F20]">{u.full_name}</div>
@@ -252,8 +293,8 @@ export default function AdminUsersPage() {
                   <option value="Hội Đồng Thành Viên (Level 1)">Hội Đồng Thành Viên (Level 1 - HDTV)</option>
                   <option value="Super Admin / CTO (Level 2)">Super Admin / CTO (Level 2 - SUPER_ADMIN)</option>
                   <option value="Trưởng Phòng HQ (Level 3)">Trưởng Phòng HQ (Level 3 - DEPARTMENT_HEAD)</option>
-                  <option value="Tổng Quản Lý Chuỗi (Level 4)">Tổng Quản Lý Chuỗi (Level 4 - GENERAL_MANAGER)</option>
-                  <option value="Quản lý Chi Nhánh (Level 5)">Quản lý Chi Nhánh (Level 5 - BRANCH_MANAGER)</option>
+                  <option value="Tổng Quản Lý Chi Nhánh (Level 4)">Tổng Quản Lý Chi Nhánh (Level 4 - GENERAL_MANAGER)</option>
+                  <option value="Quản Lý Ca & Khu Vực (Level 5)">Quản Lý Ca & Khu Vực (Level 5 - BRANCH_MANAGER)</option>
                   <option value="Nhân Viên Vận Hành (Level 6)">Nhân Viên Vận Hành (Level 6 - STAFF)</option>
                 </select>
               </div>

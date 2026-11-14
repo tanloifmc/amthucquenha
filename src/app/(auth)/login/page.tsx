@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { TEST_PROFILES, UserProfile } from '@/lib/auth/permissions';
-import { Lock, Mail, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Lock, Mail, ShieldCheck, ArrowRight, Building2, MapPin } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [selectedBranchTab, setSelectedBranchTab] = useState<'HQ' | 'PNT' | 'TT' | 'NTB'>('PNT');
 
   const handleLogin = (profile: UserProfile) => {
     setLoading(true);
@@ -53,15 +54,59 @@ export default function LoginPage() {
     }
   };
 
-  // Danh mục 6 Cấp Bậc chuẩn F&B để kiểm thử (Chỉ hiển thị Chức danh, không để tên nhân vật)
-  const sampleProfiles = [
-    { key: 'hdtv', levelBadge: 'Level 1', color: 'border-red-300 bg-red-50 text-red-800' },
-    { key: 'super_admin', levelBadge: 'Level 2', color: 'border-indigo-300 bg-indigo-50 text-indigo-800' },
-    { key: 'dept_head_mkt', levelBadge: 'Level 3', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' },
-    { key: 'general_manager', levelBadge: 'Level 4', color: 'border-amber-300 bg-amber-50 text-amber-800' },
-    { key: 'branch_manager', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
-    { key: 'staff_sales', levelBadge: 'Level 6', color: 'border-stone-300 bg-stone-50 text-stone-800' },
+  // Cấu trúc danh mục đăng nhập mẫu ĐI THEO CHI NHÁNH & CA TRỰC THỰC TẾ
+  const branchGroups = [
+    {
+      id: 'HQ',
+      name: 'Trụ Sở HQ',
+      subtitle: 'Khối Điều Hành Toàn Chuỗi',
+      icon: Building2,
+      profiles: [
+        { key: 'hdtv', levelBadge: 'Level 1', color: 'border-red-300 bg-red-50 text-red-800' },
+        { key: 'super_admin', levelBadge: 'Level 2', color: 'border-indigo-300 bg-indigo-50 text-indigo-800' },
+        { key: 'dept_head_mkt', levelBadge: 'Level 3', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' },
+        { key: 'accountant', levelBadge: 'Level 6', color: 'border-stone-300 bg-stone-50 text-stone-800' },
+      ],
+    },
+    {
+      id: 'PNT',
+      name: 'CN Phạm Ngọc Thạch',
+      subtitle: 'Quận 3 • Độc lập vận hành',
+      icon: MapPin,
+      profiles: [
+        { key: 'gm_pnt', levelBadge: 'Level 4', color: 'border-amber-300 bg-amber-50 text-amber-800' },
+        { key: 'mgr_shift_pnt', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
+        { key: 'mgr_morning_pnt', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
+        { key: 'staff_sales_pnt', levelBadge: 'Level 6', color: 'border-stone-300 bg-stone-50 text-stone-800' },
+      ],
+    },
+    {
+      id: 'TT',
+      name: 'CN Thành Thái',
+      subtitle: 'Quận 10 • Độc lập vận hành',
+      icon: MapPin,
+      profiles: [
+        { key: 'gm_tt', levelBadge: 'Level 4', color: 'border-amber-300 bg-amber-50 text-amber-800' },
+        { key: 'mgr_shift_tt', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
+        { key: 'mgr_evening_tt', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
+        { key: 'cashier_tt', levelBadge: 'Level 6', color: 'border-stone-300 bg-stone-50 text-stone-800' },
+      ],
+    },
+    {
+      id: 'NTB',
+      name: 'CN Nguyễn Thái Bình',
+      subtitle: 'Tân Bình • Độc lập vận hành',
+      icon: MapPin,
+      profiles: [
+        { key: 'gm_ntb', levelBadge: 'Level 4', color: 'border-amber-300 bg-amber-50 text-amber-800' },
+        { key: 'mgr_morning_ntb', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
+        { key: 'mgr_shift_ntb', levelBadge: 'Level 5', color: 'border-orange-300 bg-orange-50 text-orange-800' },
+        { key: 'staff_sales_ntb', levelBadge: 'Level 6', color: 'border-stone-300 bg-stone-50 text-stone-800' },
+      ],
+    },
   ];
+
+  const currentBranchGroup = branchGroups.find((g) => g.id === selectedBranchTab) || branchGroups[1];
 
   return (
     <div className="min-h-screen bg-[#FBF9F5] flex flex-col justify-center py-10 px-4 sm:px-6 lg:px-8">
@@ -83,7 +128,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-lg">
+      <div className="sm:mx-auto sm:w-full sm:max-w-xl">
         <div className="bg-white py-8 px-6 shadow-md rounded-2xl sm:px-10 border border-[#E8E2D9]">
           <div className="mb-6 border-b border-[#E8E2D9] pb-4">
             <h2 className="text-base font-bold text-[#231F20]">Đăng Nhập Hệ Thống</h2>
@@ -112,7 +157,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="hdtv@quenha.vn / ql_pnt@quenha.vn"
+                  placeholder="tql_pnt@quenha.vn / qlca_sang_pnt@quenha.vn"
                   className="w-full pl-9 pr-3 py-2 text-sm border border-[#D5C9BC] rounded-lg focus:border-[#8B1D24] focus:outline-none focus:ring-1 focus:ring-[#8B1D24]"
                 />
               </div>
@@ -145,41 +190,80 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Hộp Đăng Nhập Nhanh Theo 6 Cấp Bậc (Chỉ hiển thị Chức danh & Cấp bậc, không để tên cá nhân) */}
+          {/* HỘP ĐĂNG NHẬP NHANH THEO CHI NHÁNH & CA TRỰC THỰC TẾ (1-CLICK LOGIN) */}
           <div className="mt-8 pt-6 border-t border-[#E8E2D9]">
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-[#8B1D24] uppercase tracking-wider mb-3">
-              <ShieldCheck className="w-4 h-4 text-[#C58940]" />
-              <span>Đăng Nhập Thử Nghiệm Theo Cấp Bậc (1-Click Login):</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-1.5 text-xs font-bold text-[#8B1D24] uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4 text-[#C58940]" />
+                <span>Đăng Nhập Thử Nghiệm Đi Theo Chi Nhánh:</span>
+              </div>
+              <span className="text-[11px] font-semibold text-[#6B5E55]">3 TQL Độc Lập</span>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              {sampleProfiles.map((item) => {
-                const prof = TEST_PROFILES[item.key];
-                if (!prof) return null;
+            {/* TAB CHUYỂN ĐỔI 4 KHỐI CHI NHÁNH */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-[#FAF7F2] border border-[#E8E2D9] rounded-xl mb-3">
+              {branchGroups.map((g) => {
+                const isActive = selectedBranchTab === g.id;
                 return (
                   <button
-                    key={item.key}
+                    key={g.id}
                     type="button"
-                    onClick={() => handleLogin(prof)}
-                    className="w-full flex items-center justify-between p-2.5 rounded-lg border border-[#E8E2D9] hover:border-[#8B1D24] hover:bg-[#FDF6EE] transition-all text-left text-xs group cursor-pointer"
+                    onClick={() => setSelectedBranchTab(g.id as any)}
+                    className={`py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex flex-col items-center justify-center cursor-pointer ${
+                      isActive
+                        ? 'bg-[#8B1D24] text-white shadow-xs'
+                        : 'text-[#6B5E55] hover:text-[#231F20] hover:bg-white/60'
+                    }`}
                   >
-                    <div className="flex items-center space-x-2.5">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${item.color}`}>
-                        {item.levelBadge}
-                      </span>
-                      <div>
-                        <div className="font-bold text-[#231F20] group-hover:text-[#8B1D24]">
-                          {prof.job_title_name}
-                        </div>
-                        <div className="text-[11px] text-[#6B5E55]">
-                          {prof.department_name} • {prof.is_all_branches ? 'Toàn chuỗi 3 chi nhánh' : prof.branches[0]?.name}
-                        </div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-[#9C8E82] group-hover:text-[#8B1D24] group-hover:translate-x-0.5 transition-transform shrink-0" />
+                    <span>{g.name}</span>
                   </button>
                 );
               })}
+            </div>
+
+            {/* Danh sách vai trò của Chi nhánh đang chọn */}
+            <div className="space-y-1.5 bg-[#FAF7F2]/50 p-2.5 rounded-xl border border-[#E8E2D9]">
+              <div className="text-[11px] font-bold text-[#8B1D24] flex items-center justify-between pb-1.5 border-b border-[#E8E2D9]/60">
+                <span>{currentBranchGroup.name} — {currentBranchGroup.subtitle}</span>
+                <span className="text-[10px] text-[#6B5E55]">Bấm để vào ngay</span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 pt-1">
+                {currentBranchGroup.profiles.map((item) => {
+                  const prof = TEST_PROFILES[item.key];
+                  if (!prof) return null;
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => handleLogin(prof)}
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg border border-[#E8E2D9] bg-white hover:border-[#8B1D24] hover:bg-[#FDF6EE] transition-all text-left text-xs group cursor-pointer shadow-2xs"
+                    >
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${item.color}`}>
+                          {item.levelBadge}
+                        </span>
+                        <div className="truncate">
+                          <div className="font-bold text-[#231F20] group-hover:text-[#8B1D24] truncate">
+                            {prof.job_title_name}
+                          </div>
+                          <div className="text-[11px] text-[#6B5E55] truncate">
+                            {prof.department_name} • {prof.is_all_branches ? 'Toàn chuỗi 3 chi nhánh' : prof.branches[0]?.name}
+                          </div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#9C8E82] group-hover:text-[#8B1D24] group-hover:translate-x-0.5 transition-transform shrink-0 ml-2" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Ghi chú cơ chế phân quyền Quê Nhà */}
+            <div className="mt-3 p-2.5 rounded-lg bg-[#FDF6EE] border border-[#C58940]/30 text-[11px] text-[#6B5E55] leading-relaxed">
+              <strong className="text-[#8B1D24]">📌 Quy tắc vận hành Quê Nhà:</strong> Mỗi nhà hàng có{' '}
+              <strong>1 Tổng Quản Lý (Level 4)</strong> toàn quyền quản lý chi nhánh của mình (thêm phòng VIP, sơ đồ bàn, duyệt cọc, duyệt hủy tiệc). Dưới đó là các{' '}
+              <strong>Quản Lý (Level 5)</strong> hỗ trợ theo ca sáng/tối và cụm khu vực.
             </div>
           </div>
         </div>
@@ -192,3 +276,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

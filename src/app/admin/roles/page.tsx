@@ -21,6 +21,7 @@ import {
   Eye,
   EyeOff,
   Filter,
+  MapPin,
 } from 'lucide-react';
 import {
   ROLE_HIERARCHY,
@@ -36,6 +37,7 @@ export default function AdminRolesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDeptFilter, setSelectedDeptFilter] = useState('all');
   const [selectedLevelFilter, setSelectedLevelFilter] = useState('all');
+  const [selectedBranchFilter, setSelectedBranchFilter] = useState('all');
 
   // Modal Thêm Chức Danh Mới
   const [showAddJobModal, setShowAddJobModal] = useState(false);
@@ -43,6 +45,7 @@ export default function AdminRolesPage() {
   const [newJobCode, setNewJobCode] = useState('');
   const [newJobDept, setNewJobDept] = useState('FOH_MANAGEMENT');
   const [newJobLevel, setNewJobLevel] = useState<RoleLevel>(6);
+  const [newJobBranch, setNewJobBranch] = useState<'HQ' | 'QN_PNT' | 'QN_TT' | 'QN_NTB'>('QN_PNT');
   const [newJobDesc, setNewJobDesc] = useState('');
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -55,8 +58,12 @@ export default function AdminRolesPage() {
 
     const matchesDept = selectedDeptFilter === 'all' || job.department_code === selectedDeptFilter;
     const matchesLevel = selectedLevelFilter === 'all' || job.level === Number(selectedLevelFilter);
+    const matchesBranch =
+      selectedBranchFilter === 'all' ||
+      job.branch_code === selectedBranchFilter ||
+      (!job.branch_code && selectedBranchFilter === 'HQ');
 
-    return matchesSearch && matchesDept && matchesLevel;
+    return matchesSearch && matchesDept && matchesLevel && matchesBranch;
   });
 
   // Xử lý tạo chức danh mới
@@ -70,12 +77,19 @@ export default function AdminRolesPage() {
       ACCOUNTING: 'Phòng Tài Chính - Kế Toán',
       HR: 'Phòng Nhân Sự & Đào Tạo',
       PURCHASING: 'Phòng Thu Mua & Cung Ứng',
-      FOH_MANAGEMENT: 'Bộ Phận Quản Lý Sảnh (FOH)',
+      FOH_MANAGEMENT: 'Bộ Phận Quản Lý Sảnh & Vận Hành',
       RECEPTION_CSKH: 'Bộ Phận Đón Tiếp & CSKH',
       SERVICE_BAR: 'Bộ Phận Phục Vụ & Pha Chế',
       CASHIER: 'Bộ Phận Thu Ngân',
       KITCHEN_BOH: 'Bộ Phận Bếp & Bar (BOH)',
       SECURITY_MAINTENANCE: 'Bộ Phận Bảo Vệ & Kỹ Thuật',
+    };
+
+    const branchNameMap: Record<string, string> = {
+      HQ: 'Trụ Sở Điều Hành (HQ)',
+      QN_PNT: 'Quê Nhà - Phạm Ngọc Thạch',
+      QN_TT: 'Quê Nhà - Thành Thái',
+      QN_NTB: 'Quê Nhà - Nguyễn Thái Bình',
     };
 
     const roleMap: Record<number, string> = {
@@ -95,6 +109,8 @@ export default function AdminRolesPage() {
       department_name: deptMap[newJobDept] || newJobDept,
       level: newJobLevel,
       role_code: roleMap[newJobLevel] || 'STAFF',
+      branch_code: newJobBranch,
+      branch_name: branchNameMap[newJobBranch] || 'Chi Nhánh Quê Nhà',
       description: newJobDesc.trim() || 'Chức vụ vận hành tại Chuỗi Quê Nhà',
       is_active: true,
     };
@@ -104,7 +120,7 @@ export default function AdminRolesPage() {
     setNewJobName('');
     setNewJobCode('');
     setNewJobDesc('');
-    setNotification(`Đã tạo thành công chức danh "${newRecord.name}" (Level ${newRecord.level})!`);
+    setNotification(`Đã tạo thành công chức danh "${newRecord.name}" (Level ${newRecord.level} - ${newRecord.branch_name})!`);
     setTimeout(() => setNotification(null), 4000);
   };
 
@@ -294,6 +310,222 @@ export default function AdminRolesPage() {
             </div>
           </div>
 
+          {/* CƠ CHẾ VẬN HÀNH THỰC TẾ: 3 TỔNG QUẢN LÝ CHO 3 CHI NHÁNH & QUẢN LÝ THEO CA / KHU VỰC */}
+          <div className="bg-white rounded-2xl border border-[#E8E2D9] p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 border-b border-[#E8E2D9] gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-[#8B1D24]" />
+                  <h3 className="font-bold text-sm text-[#231F20] uppercase">
+                    Cơ Chế Phân Cấp Đi Theo Chi Nhánh: 3 Tổng Quản Lý & Quản Lý Ca / Khu Vực
+                  </h3>
+                </div>
+                <p className="text-xs text-[#6B5E55] mt-0.5">
+                  Mỗi nhà hàng có 1 Tổng Quản Lý toàn quyền điều hành cơ sở. Dưới đó là các Quản lý hỗ trợ theo Ca (Sáng/Tối) và Khu vực (Sảnh/Phòng VIP).
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#FDF6EE] text-[#8B1D24] border border-[#E8E2D9] self-start sm:self-auto">
+                3 Chi Nhánh Độc Lập
+              </span>
+            </div>
+
+            {/* GRID 4 CỘT CHI NHÁNH */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              {/* CỘT 1: TRỤ SỞ HQ */}
+              <div className="rounded-xl border border-[#D5C9BC] bg-[#FAF7F2] p-4 flex flex-col justify-between space-y-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8E2D9]">
+                    <span className="font-extrabold text-xs text-[#8B1D24] uppercase tracking-wider flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-[#8B1D24]" />
+                      Trụ Sở HQ
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">Toàn Chuỗi</span>
+                  </div>
+                  <div className="text-[11px] text-[#554A41] font-medium leading-relaxed">
+                    Điều hành chiến lược, kiểm toán tài chính & marketing chuỗi
+                  </div>
+                  <div className="space-y-1.5 pt-1">
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#8B1D24]">HĐTV / Chủ Đầu Tư</strong>
+                        <span className="text-[10px] font-bold text-red-700 bg-red-50 px-1.5 py-0.5 rounded">L1</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Giám sát tối cao, xem toàn bộ báo cáo doanh thu & P&L</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#2B6CB0]">Super Admin / CTO</strong>
+                        <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">L2</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Quản trị hệ thống, cấp quyền, API AI và nhật ký</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#2A7238]">Trưởng Phòng Chuyên Môn</strong>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">L3</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">TP MKT duyệt chiến dịch; Kế toán trưởng đối soát MISA</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-[#8B1D24] font-semibold bg-white/80 p-2 rounded border border-[#E8E2D9]">
+                  ✓ Xem dữ liệu hợp nhất 3 chi nhánh
+                </div>
+              </div>
+
+              {/* CỘT 2: CHI NHÁNH PHẠM NGỌC THẠCH */}
+              <div className="rounded-xl border border-amber-300/80 bg-[#FFFDF9] p-4 flex flex-col justify-between space-y-3 shadow-2xs">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pb-2 border-b border-amber-200">
+                    <span className="font-extrabold text-xs text-[#8B1D24] uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#C58940]" />
+                      CN Phạm Ngọc Thạch
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Quận 3</span>
+                  </div>
+                  <div className="text-[11px] text-[#554A41] font-medium leading-relaxed">
+                    28 Phạm Ngọc Thạch, P. Võ Thị Sáu, Quận 3
+                  </div>
+                  <div className="space-y-1.5 pt-1">
+                    <div className="p-2 rounded-lg bg-amber-50/70 border border-amber-200 text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-amber-900">Tổng Quản Lý Cơ Sở</strong>
+                        <span className="text-[10px] font-bold text-white bg-amber-600 px-1.5 py-0.5 rounded">L4</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Toàn quyền cơ sở PNT: sơ đồ bàn Canvas 2D, thêm phòng VIP, duyệt cọc, hủy tiệc</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#231F20]">Quản Lý Ca Tối & Cụm VIP</strong>
+                        <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">L5</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Ca tối 16:30 - 23:00, kiểm soát phòng VIP riêng tư</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#231F20]">Quản Lý Ca Sáng & Sảnh Trệt</strong>
+                        <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">L5</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Ca sáng 09:00 - 16:30, tiếp khách ăn trưa & sảnh trệt</p>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#FAF7F2] text-[10px] text-[#6B5E55]">
+                      <strong>Nhân viên (L6):</strong> Sales tiệc, Lễ tân đón tiếp, Thu ngân PNT
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-amber-800 font-semibold bg-amber-50 p-2 rounded border border-amber-200">
+                  🔒 Phân lập dữ liệu chi nhánh Quận 3
+                </div>
+              </div>
+
+              {/* CỘT 3: CHI NHÁNH THÀNH THÁI */}
+              <div className="rounded-xl border border-amber-300/80 bg-[#FFFDF9] p-4 flex flex-col justify-between space-y-3 shadow-2xs">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pb-2 border-b border-amber-200">
+                    <span className="font-extrabold text-xs text-[#8B1D24] uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#C58940]" />
+                      CN Thành Thái
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Quận 10</span>
+                  </div>
+                  <div className="text-[11px] text-[#554A41] font-medium leading-relaxed">
+                    05 Thành Thái, Phường 14, Quận 10
+                  </div>
+                  <div className="space-y-1.5 pt-1">
+                    <div className="p-2 rounded-lg bg-amber-50/70 border border-amber-200 text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-amber-900">Tổng Quản Lý Cơ Sở</strong>
+                        <span className="text-[10px] font-bold text-white bg-amber-600 px-1.5 py-0.5 rounded">L4</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Toàn quyền cơ sở TT: sơ đồ sân vườn, thêm phòng VIP, duyệt cọc, hủy tiệc</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#231F20]">Quản Lý Ca Sáng & Sân Vườn</strong>
+                        <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">L5</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Ca sáng 09:00 - 16:30, sảnh sân vườn cây xanh thoáng đãng</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#231F20]">Quản Lý Ca Tối & Lầu VIP</strong>
+                        <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">L5</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Ca tối 16:30 - 23:00, tiệc gia đình, tiếp khách lầu VIP</p>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#FAF7F2] text-[10px] text-[#6B5E55]">
+                      <strong>Nhân viên (L6):</strong> Thu ngân chính, Sales tiệc, Đón tiếp TT
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-amber-800 font-semibold bg-amber-50 p-2 rounded border border-amber-200">
+                  🔒 Phân lập dữ liệu chi nhánh Quận 10
+                </div>
+              </div>
+
+              {/* CỘT 4: CHI NHÁNH NGUYỄN THÁI BÌNH */}
+              <div className="rounded-xl border border-amber-300/80 bg-[#FFFDF9] p-4 flex flex-col justify-between space-y-3 shadow-2xs">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pb-2 border-b border-amber-200">
+                    <span className="font-extrabold text-xs text-[#8B1D24] uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#C58940]" />
+                      CN Nguyễn Thái Bình
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Tân Bình</span>
+                  </div>
+                  <div className="text-[11px] text-[#554A41] font-medium leading-relaxed">
+                    01 Nguyễn Thái Bình, Phường 4, Tân Bình
+                  </div>
+                  <div className="space-y-1.5 pt-1">
+                    <div className="p-2 rounded-lg bg-amber-50/70 border border-amber-200 text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-amber-900">Tổng Quản Lý Cơ Sở</strong>
+                        <span className="text-[10px] font-bold text-white bg-amber-600 px-1.5 py-0.5 rounded">L4</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Toàn quyền cơ sở NTB: sơ đồ hội nghị, thêm phòng VIP, duyệt cọc, hủy tiệc</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#231F20]">Quản Lý Ca Sáng & Hội Nghị</strong>
+                        <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">L5</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Ca sáng 09:00 - 16:30, khách đoàn sân bay, đối tác công ty</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white border border-[#E8E2D9] text-xs space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-[#231F20]">Quản Lý Ca Tối & Sảnh Tiệc</strong>
+                        <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">L5</span>
+                      </div>
+                      <p className="text-[10px] text-[#6B5E55]">Ca tối 16:30 - 23:00, tiệc liên hoan, sinh nhật, tất niên</p>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#FAF7F2] text-[10px] text-[#6B5E55]">
+                      <strong>Nhân viên (L6):</strong> Sales tiệc, Thu ngân, Tổ trưởng sảnh NTB
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-amber-800 font-semibold bg-amber-50 p-2 rounded border border-amber-200">
+                  🔒 Phân lập dữ liệu chi nhánh Tân Bình
+                </div>
+              </div>
+            </div>
+
+            {/* 3 NGUYÊN TẮC VẬN HÀNH BẤT BIẾN CỦA QUÊ NHÀ */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+              <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9] text-xs leading-relaxed">
+                <strong className="text-[#8B1D24] block mb-1">1. Ba Tổng Quản Lý Độc Lập (Branch Autonomy)</strong>
+                Mỗi nhà hàng do 1 Tổng Quản Lý toàn quyền cai quản. Dữ liệu phòng bàn, cọc tiệc và nhân sự của chi nhánh này được phân lập bảo mật, chi nhánh khác không thể can thiệp.
+              </div>
+              <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9] text-xs leading-relaxed">
+                <strong className="text-[#C58940] block mb-1">2. Quản Lý Theo Ca Trực & Phân Khu</strong>
+                Quản lý cấp dưới (Level 5) chia ca (Sáng / Tối) và theo khu vực (Sảnh / Phòng VIP / Sân vườn) đảm bảo luôn có người có thẩm quyền đón khách VIP và giải quyết sự cố tại chỗ.
+              </div>
+              <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9] text-xs leading-relaxed">
+                <strong className="text-[#2A7238] block mb-1">3. Toàn Quyền Sơ Đồ Bàn Phòng Canvas 2D</strong>
+                Khi cần thêm phòng VIP mới, điều chỉnh sức chứa bàn hoặc tạm khóa bảo trì, Tổng Quản Lý tự thao tác trực tiếp trên giao diện của mình mà không cần xin duyệt qua bộ phận IT.
+              </div>
+            </div>
+          </div>
+
           {/* BẢNG MA TRẬN PHÂN QUYỀN 7 MODULE CHI TIẾT */}
           <div className="bg-white rounded-2xl border border-[#E8E2D9] overflow-hidden shadow-xs">
             <div className="p-4 bg-[#FAF7F2] border-b border-[#E8E2D9] flex items-center justify-between">
@@ -441,6 +673,19 @@ export default function AdminRolesPage() {
                 />
               </div>
 
+              {/* Lọc theo Chi Nhánh */}
+              <select
+                value={selectedBranchFilter}
+                onChange={(e) => setSelectedBranchFilter(e.target.value)}
+                className="text-xs font-semibold border border-[#D5C9BC] rounded-lg px-2.5 py-2 bg-white"
+              >
+                <option value="all">Tất cả chi nhánh</option>
+                <option value="HQ">🏢 Trụ Sở HQ (Toàn Chuỗi)</option>
+                <option value="QN_PNT">📍 Quê Nhà - Phạm Ngọc Thạch (Q.3)</option>
+                <option value="QN_TT">📍 Quê Nhà - Thành Thái (Q.10)</option>
+                <option value="QN_NTB">📍 Quê Nhà - Nguyễn Thái Bình (Tân Bình)</option>
+              </select>
+
               {/* Lọc theo Phòng Ban */}
               <select
                 value={selectedDeptFilter}
@@ -453,7 +698,7 @@ export default function AdminRolesPage() {
                 <option value="ACCOUNTING">Tài Chính - Kế Toán</option>
                 <option value="HR">Nhân Sự & Đào Tạo</option>
                 <option value="PURCHASING">Thu Mua & Cung Ứng</option>
-                <option value="FOH_MANAGEMENT">Quản Lý Sảnh (FOH)</option>
+                <option value="FOH_MANAGEMENT">Quản Lý Sảnh & Vận Hành</option>
                 <option value="RECEPTION_CSKH">Đón Tiếp & CSKH</option>
                 <option value="CASHIER">Thu Ngân</option>
                 <option value="KITCHEN_BOH">Bếp & Bar (BOH)</option>
@@ -471,16 +716,16 @@ export default function AdminRolesPage() {
                 <option value="1">Level 1 - HĐTV</option>
                 <option value="2">Level 2 - Super Admin</option>
                 <option value="3">Level 3 - Trưởng Phòng HQ</option>
-                <option value="4">Level 4 - Tổng Quản Lý</option>
-                <option value="5">Level 5 - Quản Lý Chi Nhánh</option>
-                <option value="6">Level 6 - Nhân Viên</option>
+                <option value="4">Level 4 - Tổng Quản Lý Chi Nhánh</option>
+                <option value="5">Level 5 - Quản Lý Ca & Khu Vực</option>
+                <option value="6">Level 6 - Nhân Viên Thực Thi</option>
               </select>
             </div>
 
             {/* Nút Thêm Chức Danh Mới */}
             <button
               onClick={() => setShowAddJobModal(true)}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#8B1D24] hover:bg-[#72161C] text-white transition-all flex items-center gap-1.5 shadow-xs shrink-0"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#8B1D24] hover:bg-[#72161C] text-white transition-all flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Thêm Chức Danh Mới</span>
@@ -494,6 +739,7 @@ export default function AdminRolesPage() {
                 <thead className="bg-[#FAF7F2] font-bold text-[#6B5E55] uppercase text-[11px]">
                   <tr>
                     <th className="px-4 py-3">Cấp Bậc</th>
+                    <th className="px-4 py-3">Chi Nhánh</th>
                     <th className="px-4 py-3">Chức Danh F&B</th>
                     <th className="px-4 py-3">Mã Chức Vụ</th>
                     <th className="px-4 py-3">Phòng Ban Phụ Trách</th>
@@ -515,6 +761,16 @@ export default function AdminRolesPage() {
                             }`}
                           >
                             Level {job.level}
+                          </span>
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border inline-block ${
+                            job.branch_code === 'HQ'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                          }`}>
+                            {job.branch_name || 'Toàn chuỗi'}
                           </span>
                         </td>
 
@@ -552,7 +808,7 @@ export default function AdminRolesPage() {
                           <button
                             type="button"
                             onClick={() => handleToggleJobStatus(job.id)}
-                            className="text-xs font-semibold text-[#8B1D24] hover:underline"
+                            className="text-xs font-semibold text-[#8B1D24] hover:underline cursor-pointer"
                           >
                             {job.is_active ? 'Tạm ẩn' : 'Kích hoạt'}
                           </button>
@@ -587,13 +843,13 @@ export default function AdminRolesPage() {
                     Thêm Chức Danh F&B Mới
                   </h3>
                   <p className="text-xs text-[#6B5E55]">
-                    Gắn phòng ban chuyên môn và gán bậc phân quyền Hierarchy
+                    Gắn phòng ban chuyên môn, chi nhánh và gán bậc phân quyền Hierarchy
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowAddJobModal(false)}
-                className="text-[#A09383] hover:text-[#231F20] text-sm font-bold"
+                className="text-[#A09383] hover:text-[#231F20] text-sm font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -624,6 +880,22 @@ export default function AdminRolesPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                  Chi nhánh áp dụng *
+                </label>
+                <select
+                  value={newJobBranch}
+                  onChange={(e) => setNewJobBranch(e.target.value as any)}
+                  className="w-full text-xs font-semibold border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white"
+                >
+                  <option value="HQ">🏢 Trụ Sở Điều Hành (HQ - Toàn Chuỗi)</option>
+                  <option value="QN_PNT">📍 Quê Nhà - Phạm Ngọc Thạch (Quận 3)</option>
+                  <option value="QN_TT">📍 Quê Nhà - Thành Thái (Quận 10)</option>
+                  <option value="QN_NTB">📍 Quê Nhà - Nguyễn Thái Bình (Tân Bình)</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
@@ -651,8 +923,8 @@ export default function AdminRolesPage() {
                     <option value={1}>Level 1 - HĐTV / Chủ Đầu Tư</option>
                     <option value={2}>Level 2 - Super Admin / CTO</option>
                     <option value={3}>Level 3 - Trưởng Phòng HQ</option>
-                    <option value={4}>Level 4 - Tổng Quản Lý Chuỗi</option>
-                    <option value={5}>Level 5 - Quản Lý Chi Nhánh</option>
+                    <option value={4}>Level 4 - Tổng Quản Lý Chi Nhánh</option>
+                    <option value={5}>Level 5 - Quản Lý Ca & Khu Vực</option>
                     <option value={6}>Level 6 - Nhân Viên Thực Thi</option>
                   </select>
                 </div>
@@ -675,7 +947,7 @@ export default function AdminRolesPage() {
                     <option value="PURCHASING">Phòng Thu Mua & Cung Ứng</option>
                   </optgroup>
                   <optgroup label="Khối Chi Nhánh Store">
-                    <option value="FOH_MANAGEMENT">Bộ Phận Quản Lý Sảnh (FOH)</option>
+                    <option value="FOH_MANAGEMENT">Bộ Phận Quản Lý Sảnh & Vận Hành</option>
                     <option value="RECEPTION_CSKH">Bộ Phận Đón Tiếp & CSKH</option>
                     <option value="CASHIER">Bộ Phận Thu Ngân</option>
                     <option value="KITCHEN_BOH">Bộ Phận Bếp & Bar (BOH)</option>
@@ -702,13 +974,13 @@ export default function AdminRolesPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddJobModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-[#6B5E55] hover:bg-[#F5EFE6] rounded-lg"
+                  className="px-4 py-2 text-xs font-bold text-[#6B5E55] hover:bg-[#F5EFE6] rounded-lg cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-[#8B1D24] hover:bg-[#72161C] rounded-lg shadow-xs"
+                  className="px-5 py-2 text-xs font-bold text-white bg-[#8B1D24] hover:bg-[#72161C] rounded-lg shadow-xs cursor-pointer"
                 >
                   Lưu Chức Danh
                 </button>

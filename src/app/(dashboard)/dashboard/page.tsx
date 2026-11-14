@@ -39,19 +39,23 @@ export default function ExecutiveDashboardPage() {
   const [selectedBranch, setSelectedBranch] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('month');
 
-  // Đọc profile đang chọn (nếu có chuyển đổi)
+  // Đọc profile đang chọn và tự động gán phạm vi chi nhánh
   useEffect(() => {
     const saved = localStorage.getItem('quenha_current_user');
     if (saved) {
       try {
-        setCurrentUser(JSON.parse(saved));
+        const u = JSON.parse(saved);
+        setCurrentUser(u);
+        if (!u.is_all_branches && u.branches && u.branches[0]?.code) {
+          setSelectedBranch(u.branches[0].code);
+        }
       } catch {
         setCurrentUser(TEST_PROFILES.bgd);
       }
     }
   }, []);
 
-  // Tính tổng số liệu 4 chi nhánh theo bộ lọc
+  // Tính tổng số liệu chi nhánh theo bộ lọc
   const activeBranches =
     selectedBranch === 'all'
       ? BRANCH_PERFORMANCES
@@ -72,13 +76,19 @@ export default function ExecutiveDashboardPage() {
             <Sparkles className="w-3.5 h-3.5 text-[#C58940]" />
             <span>Ẩm Thực Quê Nhà</span>
             <span>•</span>
-            <span>Trung Tâm Điều Hành Ban Giám Đốc (Executive Command Center)</span>
+            <span>
+              {currentUser.is_all_branches
+                ? 'Trung Tâm Điều Hành Chuỗi Ẩm Thực'
+                : `Ban Quản Trị Cơ Sở • ${currentUser.branches[0]?.name}`}
+            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Kính chào {currentUser.job_title_name || currentUser.role_name}!
           </h1>
           <p className="text-white/80 text-sm mt-2 leading-relaxed">
-            Dữ liệu tổng hợp thời gian thực từ 3 chi nhánh (Phạm Ngọc Thạch, Thành Thái, Nguyễn Thái Bình). Hệ thống đã tự động đối soát với sổ kế toán MISA SME.
+            {currentUser.is_all_branches
+              ? 'Dữ liệu tổng hợp thời gian thực từ 3 chi nhánh (Phạm Ngọc Thạch, Thành Thái, Nguyễn Thái Bình). Hệ thống đã tự động đối soát với sổ kế toán MISA SME.'
+              : `Báo cáo số liệu thời gian thực và quản trị vận hành độc lập tại ${currentUser.branches[0]?.name}. Dữ liệu liên thông trực tiếp với Sơ đồ phòng Canvas 2D và Phễu tiệc CRM.`}
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -121,16 +131,23 @@ export default function ExecutiveDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <select
-            value={selectedBranch}
-            onChange={(e) => setSelectedBranch(e.target.value)}
-            className="text-xs font-bold border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white text-[#231F20]"
-          >
-            <option value="all">Toàn Bộ 3 Chi Nhánh</option>
-            <option value="QN_PNT">Quê Nhà - Phạm Ngọc Thạch (Q3)</option>
-            <option value="QN_TT">Quê Nhà - Thành Thái (Q10)</option>
-            <option value="QN_NTB">Quê Nhà - Nguyễn Thái Bình (Tân Bình)</option>
-          </select>
+          {currentUser.is_all_branches || (currentUser.level && currentUser.level <= 3) ? (
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              className="text-xs font-bold border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white text-[#231F20]"
+            >
+              <option value="all">Toàn Bộ 3 Chi Nhánh</option>
+              <option value="QN_PNT">Quê Nhà - Phạm Ngọc Thạch (Q3)</option>
+              <option value="QN_TT">Quê Nhà - Thành Thái (Q10)</option>
+              <option value="QN_NTB">Quê Nhà - Nguyễn Thái Bình (Tân Bình)</option>
+            </select>
+          ) : (
+            <div className="text-xs font-bold px-3 py-2 rounded-lg bg-amber-50 text-amber-900 border border-amber-300 flex items-center gap-1.5 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span>Phân Quyền Cơ Sở: {currentUser.branches[0]?.name || 'Chi Nhánh Phụ Trách'}</span>
+            </div>
+          )}
 
           <select
             value={selectedPeriod}
