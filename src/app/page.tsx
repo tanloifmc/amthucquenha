@@ -49,6 +49,10 @@ import {
   SpacePhoto,
   BranchSpaceAlbum,
 } from '@/data/landingMenuData';
+import { Spotlight } from '@/components/ui/spotlight';
+import { CardContainer, CardBody, CardItem } from '@/components/ui/three-d-card';
+import { MovingBorderButton } from '@/components/ui/moving-border';
+import { MarqueeRibbon } from '@/components/ui/marquee-ribbon';
 
 // 3 SLIDE HERO ĐẶC SẮC QUÊ NHÀ
 const HERO_SLIDES = [
@@ -550,118 +554,136 @@ export default function LandingBanquetPage() {
               <span>0938 226 166</span>
             </a>
 
-            <button
+            <MovingBorderButton
               onClick={() => {
                 const el = document.getElementById('booking-form-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#8B1D24] hover:bg-[#72161C] text-white font-bold text-xs shadow-md shadow-[#8B1D24]/20 transition-all flex items-center gap-1.5"
+              borderRadius="0.75rem"
+              duration={2800}
+              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#8B1D24] to-[#72161C] text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
             >
-              <Calendar className="w-3.5 h-3.5 text-amber-200" />
+              <Calendar className="w-3.5 h-3.5 text-[#F6D38B]" />
               <span>Đặt Tiệc</span>
-            </button>
+            </MovingBorderButton>
           </div>
         </div>
       </header>
 
-      {/* 3. HERO SECTION - 3 SLIDES CAROUSEL (TỐI ƯU MOBILE) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#8B1D24] via-[#7A161C] to-[#5A1015] text-white border-b-4 border-[#C58940]">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#C58940_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      {/* 3. HERO SECTION - THEATRICAL SPOTLIGHT & 3D CARD (ACETERNITY UI) */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#72161C] via-[#5A1015] to-[#3D0A0E] text-white border-b-4 border-[#C58940]">
+        {/* Aceternity Spotlight Effect */}
+        <Spotlight
+          className="-top-40 left-0 md:left-48 md:-top-20"
+          fill="#F6D38B"
+        />
+
+        {/* Delicate golden geometric grid pattern */}
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#C58940_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none" />
 
         {/* Nút Chuyển Slide Trái / Phải */}
         <button
           onClick={prevSlide}
           aria-label="Slide trước"
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-lg backdrop-blur-xs"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-lg backdrop-blur-xs cursor-pointer"
         >
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <button
           onClick={nextSlide}
           aria-label="Slide tiếp theo"
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-lg backdrop-blur-xs"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-lg backdrop-blur-xs cursor-pointer"
         >
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* Nội dung Slide */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Cột Trái: Tiêu Đề Nghệ Thuật & Thông Điệp */}
             <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left transition-all duration-500">
-              <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C58940]/60 text-amber-200 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-[#E5B869]" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C58940]/60 text-amber-200 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-[#F6D38B] animate-pulse" />
                 <span>{activeSlideData.tag}</span>
               </div>
 
               <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-md">
                 {activeSlideData.title} <br />
-                <span className="text-[#F6D38B] italic">{activeSlideData.highlight}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F6D38B] via-[#FFE29F] to-[#E6B357] italic">
+                  {activeSlideData.highlight}
+                </span>
               </h1>
 
               <p className="text-xs sm:text-base text-amber-50/90 leading-relaxed max-w-2xl font-light mx-auto lg:mx-0">
                 {activeSlideData.desc}
               </p>
 
-              {/* 2 Nút Hành Động Nhanh */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-1">
-                <button
+              {/* 2 Nút Hành Động: Moving Border Button + Khám Phá */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                <MovingBorderButton
                   onClick={() => {
                     const el = document.getElementById('booking-form-section');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-[#C58940] via-[#D4AF37] to-[#C58940] hover:brightness-110 text-[#5A1015] font-black text-xs sm:text-sm shadow-xl shadow-black/30 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
+                  borderRadius="0.875rem"
+                  duration={3200}
+                  className="px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#8B1D24] via-[#72161C] to-[#8B1D24] text-[#F6D38B] font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2.5 shadow-2xl"
                 >
-                  <Calendar className="w-4 h-4 text-[#5A1015]" />
+                  <Calendar className="w-4 h-4 text-[#F6D38B]" />
                   <span>Đặt Bàn & Giữ Phòng VIP Ngay</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  <ArrowRight className="w-4 h-4 text-[#F6D38B]" />
+                </MovingBorderButton>
 
                 <a
                   href="#custom-dishes"
-                  className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold text-xs sm:text-sm backdrop-blur-xs transition-all flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 hover:border-[#C58940]/60 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 group"
                 >
-                  <UtensilsCrossed className="w-4 h-4 text-[#E5B869]" />
+                  <UtensilsCrossed className="w-4 h-4 text-[#F6D38B] group-hover:rotate-12 transition-transform" />
                   <span>Khám Phá Món Ngon</span>
                 </a>
               </div>
 
               {/* 4 Thước Đo Uy Tín */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-4 sm:pt-6 border-t border-white/15 text-center">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-5 sm:pt-7 border-t border-white/15 text-center">
                 {activeSlideData.stats.map((st, i) => (
-                  <div key={i} className="bg-white/5 sm:bg-transparent p-2 sm:p-0 rounded-lg">
+                  <div key={i} className="bg-white/5 sm:bg-white/[0.03] p-2.5 sm:p-2 rounded-xl backdrop-blur-xs border border-white/5">
                     <div className="font-serif text-xl sm:text-3xl font-black text-[#F6D38B]">{st.value}</div>
-                    <div className="text-[10px] sm:text-[11px] text-amber-200/80 uppercase font-medium mt-0.5">{st.label}</div>
+                    <div className="text-[10px] sm:text-[11px] text-amber-200/80 uppercase font-medium mt-0.5 tracking-wider">{st.label}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Cột Phải: Hình Ảnh Đồ Ăn & Không Gian Rạng Rỡ Của Slide */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-sm sm:max-w-md rounded-3xl overflow-hidden p-2.5 sm:p-3 bg-gradient-to-b from-[#C58940]/40 to-transparent border-2 border-[#C58940]/60 shadow-2xl">
-                <div className="relative h-72 sm:h-96 w-full rounded-2xl overflow-hidden bg-stone-900">
-                  <Image
-                    src={activeSlideData.image}
-                    alt={activeSlideData.dishHighlight}
-                    fill
-                    className="object-cover transition-transform duration-700 hover:scale-105"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
-                    <span className="px-2 py-0.5 rounded bg-[#8B1D24] text-[#F6D38B] font-bold text-[10px] sm:text-xs uppercase tracking-wide border border-[#C58940]/40">
-                      {activeSlideData.badge}
-                    </span>
-                    <h3 className="font-serif text-base sm:text-lg font-bold mt-1.5 text-amber-100">
-                      {activeSlideData.dishHighlight}
-                    </h3>
-                    <p className="text-[11px] sm:text-xs text-amber-200/80 mt-0.5 line-clamp-1">
-                      Nguyên liệu tươi sống tuyển chọn trong ngày, giữ trọn vị quê mộc mạc.
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Cột Phải: Aceternity 3D Card Tilt Cho Món Ăn Nổi Bật */}
+            <div className="lg:col-span-5 relative flex justify-center">
+              <CardContainer className="inter-var w-full max-w-sm sm:max-w-md" containerClassName="py-0">
+                <CardBody className="relative rounded-3xl overflow-hidden p-3 bg-gradient-to-b from-[#C58940]/50 via-white/5 to-[#C58940]/20 border-2 border-[#C58940]/70 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] backdrop-blur-md group">
+                  <CardItem translateZ="75" className="relative h-72 sm:h-96 w-full rounded-2xl overflow-hidden bg-stone-900 shadow-inner">
+                    <Image
+                      src={activeSlideData.image}
+                      alt={activeSlideData.dishHighlight}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent pointer-events-none" />
+                    
+                    <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white pointer-events-none">
+                      <CardItem translateZ="90" as="div">
+                        <span className="px-2.5 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-[10px] sm:text-xs uppercase tracking-wider border border-[#C58940]/60 shadow-lg">
+                          {activeSlideData.badge}
+                        </span>
+                      </CardItem>
+                      <CardItem translateZ="110" as="h3" className="font-serif text-base sm:text-xl font-bold mt-2 text-amber-100 drop-shadow-md">
+                        {activeSlideData.dishHighlight}
+                      </CardItem>
+                      <CardItem translateZ="60" as="p" className="text-[11px] sm:text-xs text-amber-200/90 mt-1 line-clamp-2 font-light">
+                        Nguyên liệu tươi sống tuyển chọn trong ngày, giữ trọn vị quê mộc mạc Nam Bộ.
+                      </CardItem>
+                    </div>
+                  </CardItem>
+                </CardBody>
+              </CardContainer>
             </div>
           </div>
 
@@ -672,7 +694,7 @@ export default function LandingBanquetPage() {
                 key={slide.id}
                 onClick={() => setHeroSlide(idx)}
                 aria-label={`Chuyển đến slide ${idx + 1}`}
-                className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 ${
+                className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                   heroSlide === idx
                     ? 'w-8 sm:w-10 bg-[#C58940] shadow-md shadow-[#C58940]/50'
                     : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
@@ -682,6 +704,18 @@ export default function LandingBanquetPage() {
           </div>
         </div>
       </section>
+
+      {/* MARQUEE RIBBON: THƯỚC ĐO UY TÍN & ĐẲNG CẤP (MAGIC UI & ACETERNITY) */}
+      <MarqueeRibbon
+        items={[
+          { icon: <Award className="w-4 h-4 text-[#F6D38B]" />, text: 'Hơn 15 Năm Uy Tín Ẩm Thực Sài Gòn', sub: 'Est. 2010' },
+          { icon: <Building2 className="w-4 h-4 text-[#F6D38B]" />, text: 'Biệt Thự Pháp Cổ & 15 Phòng VIP Riêng Tư', sub: 'Quận 3' },
+          { icon: <Sparkles className="w-4 h-4 text-[#F6D38B]" />, text: 'Ốc Đảo Sinh Thái Sân Vườn 250 Khách', sub: 'Quận 10' },
+          { icon: <UtensilsCrossed className="w-4 h-4 text-[#F6D38B]" />, text: 'Cửa Ngõ Sân Bay Tân Sơn Nhất', sub: 'Tân Bình' },
+          { icon: <ChefHat className="w-4 h-4 text-[#F6D38B]" />, text: 'Bếp Trưởng Kỳ Cựu 20+ Năm Kinh Nghiệm', sub: 'Đặc Sản Ba Miền' },
+          { icon: <ShieldCheck className="w-4 h-4 text-[#F6D38B]" />, text: '100% Nguyên Liệu Tươi Sống Trong Ngày', sub: 'Chuẩn Vệ Sinh ATTP' },
+        ]}
+      />
 
       {/* 4. SECTION: KHÁM PHÁ 3 CHI NHÁNH ĐẮC ĐỊA */}
       <section id="branches" className="py-14 sm:py-20 bg-[#FDFBF7]">
@@ -1021,58 +1055,60 @@ export default function LandingBanquetPage() {
                 </div>
               </div>
 
-              {/* CỘT 2 (Ở Giữa - 5 cột): TÂM ĐIỂM NGHỆ THUẬT MÓN ĂN */}
+              {/* CỘT 2 (Ở Giữa - 5 cột): TÂM ĐIỂM NGHỆ THUẬT MÓN ĂN (3D TILT EFFECT) */}
               <div className="lg:col-span-5 order-1 lg:order-2 flex flex-col items-center">
-                <div className="relative w-full max-w-md aspect-square rounded-3xl overflow-hidden p-3 bg-gradient-to-b from-[#C58940]/40 via-transparent to-[#8B1D24]/20 border-2 border-[#C58940]/60 shadow-2xl group">
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden bg-stone-900">
-                    <Image
-                      src={currentDish.image || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'}
-                      alt={currentDish.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                <CardContainer className="inter-var w-full max-w-md aspect-square" containerClassName="py-0">
+                  <CardBody className="relative w-full h-full rounded-3xl overflow-hidden p-3 bg-gradient-to-b from-[#C58940]/40 via-white/5 to-[#8B1D24]/20 border-2 border-[#C58940]/60 shadow-[0_20px_50px_rgba(0,0,0,0.3)] group backdrop-blur-xs">
+                    <CardItem translateZ="60" className="relative w-full h-full rounded-2xl overflow-hidden bg-stone-900 shadow-inner">
+                      <Image
+                        src={currentDish.image || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'}
+                        alt={currentDish.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        priority
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Tag Huy Hiệu Món */}
-                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                      <span className="px-3 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-xs uppercase tracking-wide border border-[#C58940]/50 shadow-md">
-                        {currentDish.badge || (currentDish.isSignature ? 'Món Đặc Sản Quê Nhà' : 'Món Ngon Tinh Tuyển')}
-                      </span>
-                    </div>
+                      {/* Tag Huy Hiệu Món */}
+                      <CardItem translateZ="80" as="div" className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                        <span className="px-3 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-xs uppercase tracking-wide border border-[#C58940]/50 shadow-md">
+                          {currentDish.badge || (currentDish.isSignature ? 'Món Đặc Sản Quê Nhà' : 'Món Ngon Tinh Tuyển')}
+                        </span>
+                      </CardItem>
 
-                    {/* Bộ Đếm Món */}
-                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-amber-200 text-xs px-2.5 py-1 rounded-full font-bold border border-white/20">
-                      Món 0{currentDishIndex + 1} / 0{filteredDishes.length}
-                    </div>
+                      {/* Bộ Đếm Món */}
+                      <CardItem translateZ="70" as="div" className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-amber-200 text-xs px-2.5 py-1 rounded-full font-bold border border-white/20">
+                        Món 0{currentDishIndex + 1} / 0{filteredDishes.length}
+                      </CardItem>
 
-                    {/* Nút Chuyển Món Trực Tiếp Trên Tâm Điểm */}
-                    <button
-                      onClick={handlePrevDish}
-                      aria-label="Món trước đó"
-                      className="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-md backdrop-blur-xs cursor-pointer"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={handleNextDish}
-                      aria-label="Món tiếp theo"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-md backdrop-blur-xs cursor-pointer"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
+                      {/* Nút Chuyển Món Trực Tiếp Trên Tâm Điểm */}
+                      <button
+                        onClick={handlePrevDish}
+                        aria-label="Món trước đó"
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-md backdrop-blur-xs cursor-pointer z-20"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={handleNextDish}
+                        aria-label="Món tiếp theo"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-md backdrop-blur-xs cursor-pointer z-20"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
 
-                    {/* Chú thích nhanh dưới ảnh */}
-                    <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none">
-                      <div className="text-[11px] text-[#F6D38B] uppercase tracking-wider font-bold">
-                        Món Ngon Đặc Sản Quê Nhà
+                      {/* Chú thích nhanh dưới ảnh */}
+                      <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none">
+                        <CardItem translateZ="50" as="div" className="text-[11px] text-[#F6D38B] uppercase tracking-wider font-bold">
+                          Món Ngon Đặc Sản Quê Nhà
+                        </CardItem>
+                        <CardItem translateZ="90" as="h3" className="font-serif text-lg font-bold truncate text-white drop-shadow-md">
+                          {currentDish.name}
+                        </CardItem>
                       </div>
-                      <h3 className="font-serif text-lg font-bold truncate text-white">
-                        {currentDish.name}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
+                    </CardItem>
+                  </CardBody>
+                </CardContainer>
               </div>
 
               {/* CỘT 3 (Bên Phải - 4 cột): GIỚI THIỆU MÓN, GIÁ & NÚT THÊM MÓN VÀO 1 SETMENU TỰ CHỌN */}

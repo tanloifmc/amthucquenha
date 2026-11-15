@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // output: "standalone", // Enabled only when building containerized Docker images
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
