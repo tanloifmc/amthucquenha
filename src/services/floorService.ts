@@ -240,10 +240,76 @@ export const INITIAL_LOCKS: RoomLockRecord[] = [
   },
 ];
 
+declare global {
+  var quenha_locks: RoomLockRecord[] | undefined;
+}
+
+if (!globalThis.quenha_locks) {
+  globalThis.quenha_locks = [...INITIAL_LOCKS];
+}
+
 export const floorService = {
   // Lấy danh sách phòng theo chi nhánh
   async getRoomsByBranch(branchId: number): Promise<RoomTableItem[]> {
     return INITIAL_ROOMS_TABLES.filter((r) => r.branch_id === branchId);
+  },
+
+  // Lấy toàn bộ danh sách locks hiện tại (từ memory/global)
+  getLocks(): RoomLockRecord[] {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('quenha_room_locks');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch {}
+    }
+    return globalThis.quenha_locks || INITIAL_LOCKS;
+  },
+
+  // Thêm một lock phòng mới
+  addLock(lock: Omit<RoomLockRecord, 'id'>): RoomLockRecord {
+    const newRecord: RoomLockRecord = {
+      ...lock,
+      id: Date.now(),
+    };
+    if (!globalThis.quenha_locks) {
+      globalThis.quenha_locks = [...INITIAL_LOCKS];
+    }
+    globalThis.quenha_locks.push(newRecord);
+
+    if (typeof window !== 'undefined') {
+      try {
+        const current = this.getLocks();
+        const updated = [...current.filter(l => l.id !== newRecord.id), newRecord];
+        localStorage.setItem('quenha_room_locks', JSON.stringify(updated));
+      } catch {}
+    }
+
+    return newRecord;
+  },
+
+  // Giải phóng phòng ma khi tiệc bị HỦY (CRITICAL BUSINESS FLOW)
+  releaseLocksByBookingId(bookingId: number): { releasedCount: number; releasedLocks: RoomLockRecord[] } {
+    let currentLocks = this.getLocks();
+    const toRelease = currentLocks.filter((l) => l.booking_id === bookingId);
+    const remaining = currentLocks.filter((l) => l.booking_id !== bookingId);
+
+    if (globalThis.quenha_locks) {
+      globalThis.quenha_locks = globalThis.quenha_locks.filter((l) => l.booking_id !== bookingId);
+    }
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('quenha_room_locks', JSON.stringify(remaining));
+      } catch {}
+    }
+
+    return {
+      releasedCount: toRelease.length,
+      releasedLocks: toRelease,
+    };
   },
 
   // Kiểm tra va chạm phòng theo ca (Mô phỏng Trigger check_room_lock_collision)
@@ -251,9 +317,10 @@ export const floorService = {
     roomId: number,
     date: string,
     slot: 'LUNCH' | 'DINNER' | 'FULL_DAY',
-    existingLocks: RoomLockRecord[]
+    existingLocks?: RoomLockRecord[]
   ): { isConflict: boolean; reason?: string } {
-    const activeLocks = existingLocks.filter(
+    const locksToCheck = existingLocks || this.getLocks();
+    const activeLocks = locksToCheck.filter(
       (l) => l.table_room_id === roomId && l.booking_date === date && l.lock_status !== 'HOLD'
     );
 
@@ -286,7 +353,7 @@ export const floorService = {
     return { isConflict: false };
   },
 
-  // Tổng Quản lý thêm phòng VIP / Bàn mới cho chi nhánh
+  // Thêm phòng VIP / Bàn mới cho chi nhánh
   async addNewRoom(roomData: Omit<RoomTableItem, 'id'>): Promise<RoomTableItem> {
     const newId = Date.now();
     const newRoom: RoomTableItem = {
@@ -297,7 +364,7 @@ export const floorService = {
     return newRoom;
   },
 
-  // Tổng Quản lý chuyển trạng thái phòng (ví dụ bảo trì / tạm đóng)
+  // Chuyển trạng thái phòng (ví dụ bảo trì / tạm đóng)
   async toggleRoomStatus(roomId: number, status: 'AVAILABLE' | 'HOLD' | 'CONFIRMED'): Promise<boolean> {
     const target = INITIAL_ROOMS_TABLES.find((r) => r.id === roomId);
     if (target) {

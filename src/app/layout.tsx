@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["vietnamese", "latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
+  subsets: ["vietnamese", "latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Ẩm Thực Quê Nhà - Hệ Thống Quản Trị Vận Hành & CRM Tiệc",
-  description: "Hệ thống quản trị nội bộ chuỗi nhà hàng Ẩm Thực Quê Nhà - CRM Tiệc, Sơ đồ Bàn Phòng, Marketing và Kế toán Đối soát",
+  title: "Ẩm Thực Quê Nhà - Hệ Thống Tiệc & Phòng VIP Sang Trọng (Từ 2010)",
+  description: "Chuỗi nhà hàng Ẩm Thực Quê Nhà (Thành lập từ 2010) - Không gian ẩm thực ba miền tinh hoa, 45 phòng VIP sang trọng, sân vườn thoáng mát tại TP. Hồ Chí Minh.",
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",
@@ -22,13 +26,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="vi"
+      className={`${plusJakartaSans.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col font-sans text-[#231F20] bg-[#FDFBF7]">
+        {children}
+      </body>
     </html>
   );
 }

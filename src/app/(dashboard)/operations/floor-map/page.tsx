@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import {
   Grid,
   MapPin,
@@ -20,6 +21,14 @@ import {
   Building2,
   Settings2,
   Wrench,
+  Camera,
+  Images,
+  Edit2,
+  Trash2,
+  ExternalLink,
+  Save,
+  X,
+  Image as ImageIcon,
 } from 'lucide-react';
 import {
   RoomTableItem,
@@ -30,6 +39,11 @@ import {
 } from '@/services/floorService';
 import { CustomerRecord, INITIAL_CUSTOMERS } from '@/services/crmService';
 import { TableRoomShape } from '@/components/floor/FloorCanvas';
+import {
+  BRANCH_SPACES_DATA,
+  BranchSpaceAlbum,
+  SpacePhoto,
+} from '@/data/landingMenuData';
 
 // Load FloorCanvas dynamically để tránh lỗi SSR với HTML5 Canvas
 const FloorCanvas = dynamic(() => import('@/components/floor/FloorCanvas'), {
@@ -45,10 +59,149 @@ export default function FloorMapOperationsPage() {
   const [selectedBranchId, setSelectedBranchId] = useState<number>(1);
   const [selectedDate, setSelectedDate] = useState<string>('2026-11-20');
   const [selectedShift, setSelectedShift] = useState<'LUNCH' | 'DINNER' | 'FULL_DAY'>('DINNER');
-  const [viewMode, setViewMode] = useState<'GRID' | 'CANVAS'>('GRID');
+  const [viewMode, setViewMode] = useState<'GRID' | 'CANVAS' | 'ALBUM'>('GRID');
 
   const [rooms, setRooms] = useState<RoomTableItem[]>(INITIAL_ROOMS_TABLES);
   const [locks, setLocks] = useState<RoomLockRecord[]>(INITIAL_LOCKS);
+
+  // Quản lý Album & Hình Ảnh Không Gian của Tổng Quản Lý
+  const [spaceAlbums, setSpaceAlbums] = useState<BranchSpaceAlbum[]>(BRANCH_SPACES_DATA);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [editingPhoto, setEditingPhoto] = useState<SpacePhoto | null>(null);
+  const [photoTitle, setPhotoTitle] = useState('');
+  const [photoType, setPhotoType] = useState<'VIP' | 'SAN_VUON' | 'SANH_TIEC' | 'BAN_TIEC'>('VIP');
+  const [photoTypeLabel, setPhotoTypeLabel] = useState('Phòng VIP Đẳng Cấp');
+  const [photoCapacity, setPhotoCapacity] = useState('15 - 25 khách');
+  const [photoFeatures, setPhotoFeatures] = useState('');
+  const [photoDescription, setPhotoDescription] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+
+  // Tải dữ liệu Album & Locks đã lưu trong localStorage (nếu có)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('quenha_space_albums');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSpaceAlbums(parsed);
+          }
+        }
+      } catch {}
+
+      try {
+        const storedLocks = localStorage.getItem('quenha_room_locks');
+        if (storedLocks) {
+          const parsed = JSON.parse(storedLocks);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setLocks(parsed);
+          }
+        }
+      } catch {}
+    }
+  }, []);
+
+  const currentBranchCode = selectedBranchId === 1 ? 'QN_PNT' : selectedBranchId === 2 ? 'QN_TT' : 'QN_NTB';
+  const currentBranchAlbum = spaceAlbums.find((a) => a.branchCode === currentBranchCode) || spaceAlbums[0];
+
+  const handleSaveAlbumsToStorage = (updated: BranchSpaceAlbum[]) => {
+    setSpaceAlbums(updated);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quenha_space_albums', JSON.stringify(updated));
+    }
+    setNotificationMsg('Đã lưu & đồng bộ thành công album không gian! Hình ảnh đã sẵn sàng phục vụ khách hàng.');
+    setTimeout(() => setNotificationMsg(null), 4000);
+  };
+
+  const handleOpenAddPhoto = () => {
+    setEditingPhoto(null);
+    setPhotoTitle('');
+    setPhotoType('VIP');
+    setPhotoTypeLabel('Phòng VIP Đẳng Cấp');
+    setPhotoCapacity('10 - 20 khách');
+    setPhotoFeatures('Máy lạnh công suất lớn, Bàn tròn xoay, Hoa tươi');
+    setPhotoDescription('');
+    setPhotoUrl('https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80');
+    setShowPhotoModal(true);
+  };
+
+  const handleOpenEditPhoto = (photo: SpacePhoto) => {
+    setEditingPhoto(photo);
+    setPhotoTitle(photo.title);
+    setPhotoType(photo.type);
+    setPhotoTypeLabel(photo.typeLabel);
+    setPhotoCapacity(photo.capacity);
+    setPhotoFeatures(photo.features.join(', '));
+    setPhotoDescription(photo.description);
+    setPhotoUrl(photo.image);
+    setShowPhotoModal(true);
+  };
+
+  const handleSavePhoto = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!photoTitle.trim() || !photoUrl.trim()) return;
+
+    const feats = photoFeatures
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const updatedAlbums = spaceAlbums.map((album) => {
+      if (album.branchCode !== currentBranchCode) return album;
+
+      if (editingPhoto) {
+        return {
+          ...album,
+          photos: album.photos.map((p) =>
+            p.id === editingPhoto.id
+              ? {
+                  ...p,
+                  title: photoTitle.trim(),
+                  type: photoType,
+                  typeLabel: photoTypeLabel.trim(),
+                  capacity: photoCapacity.trim(),
+                  features: feats.length > 0 ? feats : ['Không gian ấm cúng', 'Phục vụ tận tâm'],
+                  description: photoDescription.trim(),
+                  image: photoUrl.trim(),
+                }
+              : p
+          ),
+        };
+      } else {
+        const newPhotoItem: SpacePhoto = {
+          id: `${currentBranchCode.toLowerCase()}-${Date.now()}`,
+          title: photoTitle.trim(),
+          type: photoType,
+          typeLabel: photoTypeLabel.trim(),
+          capacity: photoCapacity.trim(),
+          features: feats.length > 0 ? feats : ['Không gian trang nhã', 'Máy lạnh riêng'],
+          description: photoDescription.trim(),
+          image: photoUrl.trim(),
+        };
+        return {
+          ...album,
+          photos: [newPhotoItem, ...album.photos],
+        };
+      }
+    });
+
+    handleSaveAlbumsToStorage(updatedAlbums);
+    setShowPhotoModal(false);
+  };
+
+  const handleDeletePhoto = (photoId: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa góc chụp này khỏi Album không gian của chi nhánh?')) return;
+
+    const updatedAlbums = spaceAlbums.map((album) => {
+      if (album.branchCode !== currentBranchCode) return album;
+      return {
+        ...album,
+        photos: album.photos.filter((p) => p.id !== photoId),
+      };
+    });
+
+    handleSaveAlbumsToStorage(updatedAlbums);
+  };
 
   // Modal Đặt phòng nhanh
   const [bookingTargetRoom, setBookingTargetRoom] = useState<RoomTableItem | null>(null);
@@ -174,7 +327,14 @@ export default function FloorMapOperationsPage() {
       guest_count: Number(guestCount),
     };
 
-    setLocks([...locks, newLock]);
+    const updatedLocks = [...locks, newLock];
+    setLocks(updatedLocks);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('quenha_room_locks', JSON.stringify(updatedLocks));
+      } catch {}
+    }
+    floorService.addLock(newLock);
     setBookingTargetRoom(null);
     setCustomerName('');
     setCustomerPhone('');
@@ -291,6 +451,18 @@ export default function FloorMapOperationsPage() {
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Bản Đồ 2D Canvas</span>
+            </button>
+            <button
+              onClick={() => setViewMode('ALBUM')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                viewMode === 'ALBUM'
+                  ? 'bg-[#8B1D24] text-white shadow-xs'
+                  : 'text-[#6B5E55] hover:text-[#231F20]'
+              }`}
+              title="Quyền Tổng Quản Lý: Quản trị Album hình ảnh không gian & phòng VIP chi nhánh"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span>Album Không Gian (Tổng Quản Lý)</span>
             </button>
           </div>
 
@@ -413,7 +585,7 @@ export default function FloorMapOperationsPage() {
       </div>
 
       {/* HIỂN THỊ CHẾ ĐỘ 1: LƯỚI THẺ (TABLET / MOBILE CHO LỄ TÂN) */}
-      {viewMode === 'GRID' ? (
+      {viewMode === 'GRID' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
           {computedRooms.map((room) => {
             const isAvailable = room.current_status === 'AVAILABLE';
@@ -506,8 +678,9 @@ export default function FloorMapOperationsPage() {
             );
           })}
         </div>
-      ) : (
-        /* HIỂN THỊ CHẾ ĐỘ 2: BẢN ĐỒ 2D CANVAS (KONVA) */
+      )}
+      {/* HIỂN THỊ CHẾ ĐỘ 2: BẢN ĐỒ 2D CANVAS (KONVA) */}
+      {viewMode === 'CANVAS' && (
         <div className="space-y-3">
           <FloorCanvas
             tables={canvasTables}
@@ -519,6 +692,138 @@ export default function FloorMapOperationsPage() {
           <p className="text-xs text-[#6B5E55] italic text-center">
             💡 Nhấp chuột vào bất kỳ phòng VIP hoặc bàn nào trên Canvas để xem chi tiết hoặc mở form nhận tiệc.
           </p>
+        </div>
+      )}
+
+      {/* HIỂN THỊ CHẾ ĐỘ 3: QUẢN LÝ ALBUM & HÌNH ẢNH KHÔNG GIAN (TOÀN QUYỀN TỔNG QUẢN LÝ) */}
+      {viewMode === 'ALBUM' && (
+        <div className="space-y-6">
+          {/* Header Bảng Quản Trị Album */}
+          <div className="p-5 bg-white rounded-2xl border border-[#E8E2D9] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-[#8B1D24]/10 text-[#8B1D24]">
+                  <Images className="w-5 h-5" />
+                </span>
+                <div>
+                  <h3 className="font-bold text-base text-[#231F20]">
+                    Album Không Gian: {currentBranchAlbum.branchName}
+                  </h3>
+                  <p className="text-xs text-[#6B5E55]">
+                    {currentBranchAlbum.tagline} • Sức chứa: {currentBranchAlbum.totalCapacity} ({currentBranchAlbum.photos.length} góc chụp)
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleOpenAddPhoto}
+                className="px-4 py-2 rounded-xl bg-[#8B1D24] text-white text-xs font-bold hover:bg-[#72161C] transition-all flex items-center gap-1.5 shadow-xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Thêm Ảnh Góc Không Gian Mới</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Lưới các thẻ ảnh trong album chi nhánh */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {currentBranchAlbum.photos.map((photo, index) => (
+              <div
+                key={photo.id}
+                className="bg-white rounded-2xl border border-[#E8E2D9] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                <div>
+                  {/* Khung ảnh */}
+                  <div className="relative aspect-[16/10] w-full bg-stone-200">
+                    <img
+                      src={photo.image}
+                      alt={photo.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#8B1D24] text-white shadow-md">
+                        {photo.typeLabel}
+                      </span>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-xs">
+                        {photo.capacity}
+                      </span>
+                    </div>
+
+                    <div className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/90 text-[#231F20] shadow-xs">
+                      #{index + 1}
+                    </div>
+                  </div>
+
+                  {/* Nội dung chi tiết */}
+                  <div className="p-4 space-y-2">
+                    <h4 className="font-serif font-bold text-base text-[#231F20]">
+                      {photo.title}
+                    </h4>
+                    <p className="text-xs text-[#6B5E55] leading-relaxed line-clamp-2">
+                      {photo.description}
+                    </p>
+
+                    {/* Danh sách tiện ích */}
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {photo.features.map((feat, i) => (
+                        <span
+                          key={i}
+                          className="text-[10px] px-2 py-0.5 rounded bg-[#FAF7F2] text-[#6B5E55] border border-[#E8E2D9]"
+                        >
+                          ✓ {feat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Các nút thao tác của Tổng Quản Lý */}
+                <div className="p-3 bg-[#FAF7F2] border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                  <span className="text-[11px] text-[#A09383] font-mono">
+                    ID: {photo.id}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditPhoto(photo)}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-[#D5C9BC] hover:border-[#8B1D24] text-[#231F20] hover:text-[#8B1D24] font-bold text-xs transition-colors flex items-center gap-1 shadow-2xs"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                      <span>Sửa</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePhoto(photo.id)}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-red-200 hover:bg-red-50 text-red-600 font-bold text-xs transition-colors flex items-center gap-1 shadow-2xs"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Xóa</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center justify-between">
+            <div>
+              <strong>Lưu ý nghiệp vụ Tổng Quản Lý:</strong> Mọi hình ảnh và mô tả không gian chỉnh sửa tại đây sẽ được lưu trữ an toàn trong hệ thống và tự động liên thông với Trang tiếp đón khách hàng thương mại.
+            </div>
+            <a
+              href="/#spaces"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-[#8B1D24] underline flex items-center gap-1 shrink-0 ml-4"
+            >
+              <span>Xem trang thương mại</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
         </div>
       )}
 
@@ -782,6 +1087,168 @@ export default function FloorMapOperationsPage() {
                   className="px-5 py-2 text-xs font-bold text-white bg-[#8B1D24] hover:bg-[#72161C] rounded-lg shadow-xs"
                 >
                   Lưu & Đưa Vào Vận Hành
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL THÊM / CHỈNH SỬA ẢNH KHÔNG GIAN DÀNH CHO TỔNG QUẢN LÝ */}
+      {showPhotoModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#E8E2D9] animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E8E2D9] mb-4">
+              <div className="flex items-center gap-2">
+                <Camera className="w-5 h-5 text-[#8B1D24]" />
+                <div>
+                  <h3 className="font-bold text-base text-[#231F20]">
+                    {editingPhoto ? 'Chỉnh Sửa Góc Không Gian' : 'Thêm Ảnh Góc Không Gian Mới'}
+                  </h3>
+                  <p className="text-xs text-[#6B5E55]">
+                    {currentBranchAlbum.branchName} • Toàn quyền Tổng Quản Lý
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPhotoModal(false)}
+                className="text-[#A09383] hover:text-[#231F20] text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePhoto} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                  Tên góc không gian / Phòng VIP *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Vd: Phòng VIP Ngoại Giao Tổng Thống"
+                  value={photoTitle}
+                  onChange={(e) => setPhotoTitle(e.target.value)}
+                  className="w-full text-xs font-bold border border-[#D5C9BC] rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                  Đường dẫn ảnh (URL) *
+                </label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://images.unsplash.com/..."
+                  value={photoUrl}
+                  onChange={(e) => setPhotoUrl(e.target.value)}
+                  className="w-full text-xs font-mono border border-[#D5C9BC] rounded-lg px-3 py-2 bg-[#FAF7F2]"
+                />
+                {photoUrl && (
+                  <div className="mt-2 aspect-[16/9] w-full rounded-xl overflow-hidden bg-stone-100 border border-stone-300">
+                    <img
+                      src={photoUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                    Phân loại không gian *
+                  </label>
+                  <select
+                    value={photoType}
+                    onChange={(e) => {
+                      const val = e.target.value as any;
+                      setPhotoType(val);
+                      if (val === 'VIP') setPhotoTypeLabel('Phòng VIP Đẳng Cấp');
+                      else if (val === 'SAN_VUON') setPhotoTypeLabel('Sân Vườn Sinh Thái');
+                      else if (val === 'SANH_TIEC') setPhotoTypeLabel('Sảnh Tiệc Lớn');
+                      else setPhotoTypeLabel('Khu Bàn Tiệc');
+                    }}
+                    className="w-full text-xs font-semibold border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white"
+                  >
+                    <option value="VIP">Phòng VIP Riêng Tư</option>
+                    <option value="SAN_VUON">Sân Vườn Sinh Thái</option>
+                    <option value="SANH_TIEC">Sảnh Tiệc Lớn</option>
+                    <option value="BAN_TIEC">Khu Bàn Tiệc</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                    Sức chứa hiển thị *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Vd: 20 - 35 khách"
+                    value={photoCapacity}
+                    onChange={(e) => setPhotoCapacity(e.target.value)}
+                    className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                  Nhãn hiển thị nổi bật
+                </label>
+                <input
+                  type="text"
+                  placeholder="Vd: Phòng VIP Thân Mật / View Sân Vườn"
+                  value={photoTypeLabel}
+                  onChange={(e) => setPhotoTypeLabel(e.target.value)}
+                  className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                  Tiện ích đặc trưng (cách nhau bởi dấu phẩy)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Máy lạnh riêng, Bàn tròn xoay, Dàn karaoke, Kệ vang"
+                  value={photoFeatures}
+                  onChange={(e) => setPhotoFeatures(e.target.value)}
+                  className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
+                  Mô tả góc không gian
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Kiến trúc biệt thự trang trọng, cách âm tốt, thích hợp cho tiệc tiếp khách..."
+                  value={photoDescription}
+                  onChange={(e) => setPhotoDescription(e.target.value)}
+                  className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E8E2D9]">
+                <button
+                  type="button"
+                  onClick={() => setShowPhotoModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-[#6B5E55] hover:bg-[#F5EFE6] rounded-lg"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold text-white bg-[#8B1D24] hover:bg-[#72161C] rounded-lg shadow-xs"
+                >
+                  {editingPhoto ? 'Lưu Thay Đổi' : 'Thêm Vào Album'}
                 </button>
               </div>
             </form>

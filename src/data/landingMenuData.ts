@@ -10,6 +10,17 @@ export interface BranchInfo {
   features: string[];
   description: string;
   bgGradient: string;
+  id?: string;
+  image?: string;
+  highlightTag?: string;
+  capacity?: string;
+}
+
+export interface SetMenuDishItem {
+  name: string;
+  image: string;
+  category?: string;
+  description?: string;
 }
 
 export interface SetMenu {
@@ -20,6 +31,7 @@ export interface SetMenu {
   badge?: string;
   description: string;
   dishes: string[];
+  dishItems?: SetMenuDishItem[];
   suitableFor: string;
 }
 
@@ -31,11 +43,16 @@ export interface DishItem {
   description: string;
   badge?: string;
   isSignature?: boolean;
+  image?: string;
 }
 
 export const BRANCHES_DATA: BranchInfo[] = [
   {
     code: 'QN_PNT',
+    id: 'QN_PNT',
+    image: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=800&q=80',
+    highlightTag: 'Biệt Thự Pháp Cổ - Quận 3',
+    capacity: '160 khách (15 VIP)',
     name: 'Chi Nhánh Phạm Ngọc Thạch',
     district: 'Quận 3',
     tagline: 'Biệt Thự Pháp Cổ & Tiệc VIP Ngoại Giao',
@@ -55,6 +72,10 @@ export const BRANCHES_DATA: BranchInfo[] = [
   },
   {
     code: 'QN_TT',
+    id: 'QN_TT',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+    highlightTag: 'Sân Vườn Sinh Thái - Quận 10',
+    capacity: '250 khách (18 VIP)',
     name: 'Chi Nhánh Thành Thái',
     district: 'Quận 10',
     tagline: 'Ốc Đảo Sân Vườn Sinh Thái & Sảnh Tiệc 250 Khách',
@@ -74,6 +95,10 @@ export const BRANCHES_DATA: BranchInfo[] = [
   },
   {
     code: 'QN_NTB',
+    id: 'QN_NTB',
+    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80',
+    highlightTag: 'Cửa Ngõ Sân Bay - Tân Bình',
+    capacity: '180 khách (12 VIP)',
     name: 'Chi Nhánh Nguyễn Thái Bình',
     district: 'Tân Bình',
     tagline: 'Cửa Ngõ Sân Bay & Sảnh Hội Nghị Ấm Cúng',
@@ -110,6 +135,44 @@ export const SET_MENUS_DATA: SetMenu[] = [
       'Lẩu riêu cua đồng bắp bò Quê Nhà thanh ngọt',
       'Tráng miệng: Chè hạt sen long nhãn thanh mát',
     ],
+    dishItems: [
+      {
+        name: 'Gỏi tép đồng bông điên điển củ hũ dừa',
+        category: 'Khai Vị',
+        image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+        description: 'Tép đồng tươi ngọt dịu kết hợp bông điên điển mùa lũ và củ hũ dừa giòn sần sật.',
+      },
+      {
+        name: 'Chả giò Quê Nhà giòn rụm sốt chua ngọt',
+        category: 'Khai Vị',
+        image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+        description: 'Vỏ rế mỏng vàng ruộm giòn tan, nhân tôm thịt cua tươi nêm gia vị gia truyền.',
+      },
+      {
+        name: 'Gà ta thả vườn hấp lá chúc An Giang',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80',
+        description: 'Gà ta thả vườn thịt săn chắc ngọt lịm, dậy mùi thơm nồng nàn tinh dầu lá chúc Thất Sơn.',
+      },
+      {
+        name: 'Bò tơ nướng tảng than hoa muối kiến vàng',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80',
+        description: 'Bò tơ tươi mềm ngọt nước xèo trên bếp than hồng, chấm muối kiến vàng Krông Pa độc đáo.',
+      },
+      {
+        name: 'Lẩu riêu cua đồng bắp bò Quê Nhà',
+        category: 'Lẩu',
+        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80',
+        description: 'Nước dùng cua đồng giã tay 100% thanh ngọt, gạch cua béo ngậy ăn kèm bắp bò hoa.',
+      },
+      {
+        name: 'Tráng miệng: Chè hạt sen long nhãn',
+        category: 'Tráng Miệng',
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
+        description: 'Hạt sen Huế bùi bùi bọc trong cùi nhãn ngọt thơm nấu đường phèn thanh khiết.',
+      },
+    ],
   },
   {
     id: 'set-nhu-y',
@@ -126,6 +189,44 @@ export const SET_MENUS_DATA: SetMenu[] = [
       'Tôm sú đại sốt hoàng kim trứng muối béo ngậy',
       'Lẩu cá tầm nấu măng chua lá giang thanh khiết',
       'Tráng miệng: Bánh flan cốt dừa Quê Nhà & Trái cây mùa',
+    ],
+    dishItems: [
+      {
+        name: 'Khai vị 3 món: Gỏi bưởi + Đậu hũ + Chả đùm',
+        category: 'Khai Vị',
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+        description: 'Mâm khai vị 3 vị đánh thức vị giác: chua ngọt thanh mát, giòn rụm béo bùi và thơm đượm lá cách.',
+      },
+      {
+        name: 'Heo mẹt 4 món nổ cốm giòn da',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+        description: 'Heo sữa quay da nổ cốm giòn tan, dồi sụn nướng than hoa, lòng heo luộc và chả giò Quê Nhà.',
+      },
+      {
+        name: 'Cá lăng sông nướng muối ớt rừng',
+        category: 'Hải Sản',
+        image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
+        description: 'Cá lăng sông tươi chắc thịt béo bùi, ướp muối ớt rừng Tây Bắc nướng than hoa vàng rượm.',
+      },
+      {
+        name: 'Tôm sú đại sốt hoàng kim trứng muối',
+        category: 'Hải Sản',
+        image: 'https://images.unsplash.com/photo-1559742811-822873691df8?auto=format&fit=crop&w=600&q=80',
+        description: 'Tôm sú tươi sống chiên giòn phủ trọn lớp sốt trứng muối béo bùi sánh mịn thơm lừng.',
+      },
+      {
+        name: 'Lẩu cá tầm nấu măng chua lá giang',
+        category: 'Lẩu',
+        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+        description: 'Cá tầm sụn béo giòn ninh trong nước măng chua giòn và lá giang chua dịu sảng khoái.',
+      },
+      {
+        name: 'Tráng miệng: Bánh flan cốt dừa & Trái cây',
+        category: 'Tráng Miệng',
+        image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80',
+        description: 'Bánh flan trứng gà ta mềm mượt béo ngậy chan nước cốt dừa nướng cùng mẹt hoa quả thanh nhiệt.',
+      },
     ],
   },
   {
@@ -145,6 +246,50 @@ export const SET_MENUS_DATA: SetMenu[] = [
       'Lẩu nấm hải sản thượng hạng Quê Nhà',
       'Tráng miệng: Chè yến sào tiềm hạt sen táo đỏ',
     ],
+    dishItems: [
+      {
+        name: 'Gỏi sứa biển Nha Trang rong nho tuyết nhĩ',
+        category: 'Khai Vị',
+        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80',
+        description: 'Sứa biển tươi giòn sần sật, rong nho mọng nước kết hợp tuyết nhĩ và nước mắm nhĩ chua ngọt.',
+      },
+      {
+        name: 'Nem cua bể đất Cảng nướng than hoa',
+        category: 'Khai Vị',
+        image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+        description: 'Thịt cua bể tươi béo nạc kết hợp mộc nhĩ nấm hương bọc bánh đa nướng giòn rụm thơm lừng.',
+      },
+      {
+        name: 'Bò Wagyu nướng xốt tiêu rừng Phú Quốc',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+        description: 'Bò Wagyu vân mỡ cẩm thạch mềm tan đượm sốt tiêu sọ chín đỏ Phú Quốc, ăn kèm khoai tây nghiền mịn.',
+      },
+      {
+        name: 'Mực một nắng Phú Quốc nướng sa tế tôm',
+        category: 'Hải Sản',
+        image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80',
+        description: 'Mực ống dày mình phơi đúng một nắng đảo ngọc, nướng xì xèo trên than hồng thơm cay đượm vị.',
+      },
+      {
+        name: 'Cá chình hoa om chuối đậu đất Bắc niêu đất',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?auto=format&fit=crop&w=600&q=80',
+        description: 'Cá chình hoa béo ngậy om chậm cùng chuối xanh, đậu phụ chiên trong niêu đất nung thơm nức mũi.',
+      },
+      {
+        name: 'Lẩu nấm hải sản thượng hạng Quê Nhà',
+        category: 'Lẩu',
+        image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80',
+        description: 'Nước dùng ninh từ 7 loại nấm rừng quý và hải sản tươi sống ngọt lành thanh lọc cơ thể.',
+      },
+      {
+        name: 'Tráng miệng: Chè yến sào tiềm hạt sen táo đỏ',
+        category: 'Tráng Miệng',
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
+        description: 'Tổ yến đảo chưng cách thủy cùng hạt sen Tây Hồ và táo đỏ hữu cơ thanh tao bổ dưỡng.',
+      },
+    ],
   },
   {
     id: 'set-thuong-uyen',
@@ -162,6 +307,44 @@ export const SET_MENUS_DATA: SetMenu[] = [
       'Súp vi cá hải sâm cung đình',
       'Tráng miệng: Yến chưng đường phèn hoa cúc vạn thọ',
     ],
+    dishItems: [
+      {
+        name: 'Khai vị: Bào ngư sốt dầu hào & Salad cá hồi',
+        category: 'Khai Vị',
+        image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80',
+        description: 'Bào ngư nguyên con hầm mềm mọng nước cùng sốt dầu hào thượng phẩm và salad cá hồi Nauy.',
+      },
+      {
+        name: 'Tôm hùm bông nướng phô mai Pháp',
+        category: 'Hải Sản',
+        image: 'https://images.unsplash.com/photo-1559742811-822873691df8?auto=format&fit=crop&w=600&q=80',
+        description: 'Tôm hùm bông tươi sống Nha Trang phủ lớp phô mai béo thơm nướng vàng óng lừng danh.',
+      },
+      {
+        name: 'Bò Úc đút lò sốt vang đỏ & Nấm Truffle',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+        description: 'Thăn bò Úc hảo hạng nướng mọng nước đượm hương thơm tinh tế từ nấm Truffle đen quý hiếm.',
+      },
+      {
+        name: 'Cá bơn Hàn Quốc hấp xì dầu gừng non',
+        category: 'Hải Sản',
+        image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
+        description: 'Cá bơn sống hấp vừa chín tới, giữ nguyên vị ngọt thanh và thớ thịt trắng tinh mịn màng.',
+      },
+      {
+        name: 'Súp vi cá hải sâm cung đình',
+        category: 'Món Chính',
+        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80',
+        description: 'Món súp đại bổ hầm chậm từ hải sâm đen và nước cốt sườn non đậm đà bổ dưỡng.',
+      },
+      {
+        name: 'Tráng miệng: Yến chưng đường phèn hoa cúc',
+        category: 'Tráng Miệng',
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
+        description: 'Tổ yến sợi dài chưng đường phèn thanh nhẹ kết hợp cánh hoa cúc hữu cơ thanh nhiệt an thần.',
+      },
+    ],
   },
 ];
 
@@ -169,6 +352,7 @@ export const DISHES_DATA: DishItem[] = [
   // Khai vị
   {
     id: 'dish-1',
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
     name: 'Gỏi Tép Đồng Bông Điên Điển',
     category: 'KHAI_VI',
     price: 185000,
@@ -178,6 +362,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-2',
+    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
     name: 'Chả Giò Quê Nhà Giòn Rụm',
     category: 'KHAI_VI',
     price: 195000,
@@ -187,6 +372,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-3',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
     name: 'Đậu Hũ Khói Lửa Quê Nhà',
     category: 'KHAI_VI',
     price: 175000,
@@ -194,6 +380,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-4',
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80',
     name: 'Gỏi Củ Hũ Dừa Tôm Thịt',
     category: 'KHAI_VI',
     price: 210000,
@@ -203,6 +390,7 @@ export const DISHES_DATA: DishItem[] = [
   // Món chính đặc sản
   {
     id: 'dish-5',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
     name: 'Heo Mẹt 4 Món Giòn Da Quê Nhà',
     category: 'MON_CHINH',
     price: 780000,
@@ -212,6 +400,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-6',
+    image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80',
     name: 'Gà Ta Hấp Lá Chúc An Giang',
     category: 'MON_CHINH',
     price: 495000,
@@ -221,6 +410,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-7',
+    image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80',
     name: 'Bò Tơ Nướng Tảng Muối Kiến Vàng',
     category: 'MON_CHINH',
     price: 460000,
@@ -229,6 +419,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-8',
+    image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600&q=80',
     name: 'Giò Heo Chiên Giòn Bánh Bao',
     category: 'MON_CHINH',
     price: 420000,
@@ -238,6 +429,7 @@ export const DISHES_DATA: DishItem[] = [
   // Hải sản
   {
     id: 'dish-9',
+    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
     name: 'Cá Lăng Nướng Muối Ớt Rừng',
     category: 'HAI_SAN',
     price: 550000,
@@ -247,6 +439,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-10',
+    image: 'https://images.unsplash.com/photo-1559742811-822873691df8?auto=format&fit=crop&w=600&q=80',
     name: 'Tôm Sú Hoàng Kim Sốt Trứng Muối',
     category: 'HAI_SAN',
     price: 480000,
@@ -255,6 +448,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-11',
+    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80',
     name: 'Mực Một Nắng Nướng Sa Tế',
     category: 'HAI_SAN',
     price: 420000,
@@ -262,6 +456,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-12',
+    image: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?auto=format&fit=crop&w=600&q=80',
     name: 'Cá Chình Nướng Nghệ Giềng',
     category: 'HAI_SAN',
     price: 680000,
@@ -271,6 +466,7 @@ export const DISHES_DATA: DishItem[] = [
   // Lẩu truyền thống
   {
     id: 'dish-13',
+    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80',
     name: 'Lẩu Riêu Cua Bắp Bò Quê Nhà',
     category: 'LAU',
     price: 520000,
@@ -280,6 +476,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-14',
+    image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
     name: 'Lẩu Cá Tầm Măng Chua Lá Giang',
     category: 'LAU',
     price: 650000,
@@ -288,6 +485,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-15',
+    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80',
     name: 'Lẩu Gà Ta Nấu Nấm Rừng',
     category: 'LAU',
     price: 490000,
@@ -297,6 +495,7 @@ export const DISHES_DATA: DishItem[] = [
   // Tráng miệng
   {
     id: 'dish-16',
+    image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
     name: 'Chè Hạt Sen Long Nhãn',
     category: 'TRANG_MIENG',
     price: 45000,
@@ -304,6 +503,7 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-17',
+    image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80',
     name: 'Bánh Flan Cốt Dừa Quê Nhà',
     category: 'TRANG_MIENG',
     price: 40000,
@@ -311,9 +511,204 @@ export const DISHES_DATA: DishItem[] = [
   },
   {
     id: 'dish-18',
+    image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80',
     name: 'Trái Cây Tươi Thập Cẩm Theo Mùa',
     category: 'TRANG_MIENG',
     price: 180000,
     description: 'Mẹt dưa lưới, bưởi da xanh, xoài cát, nho móng tay ướp lạnh giòn ngọt.',
+  },
+];
+
+export interface SpacePhoto {
+  id: string;
+  title: string;
+  type: 'VIP' | 'SAN_VUON' | 'SANH_TIEC' | 'BAN_TIEC';
+  typeLabel: string;
+  capacity: string;
+  features: string[];
+  description: string;
+  image: string;
+}
+
+export interface BranchSpaceAlbum {
+  branchCode: 'QN_PNT' | 'QN_TT' | 'QN_NTB';
+  branchName: string;
+  district: string;
+  tagline: string;
+  totalVip: number;
+  totalCapacity: string;
+  photos: SpacePhoto[];
+}
+
+export const BRANCH_SPACES_DATA: BranchSpaceAlbum[] = [
+  {
+    branchCode: 'QN_PNT',
+    branchName: 'Chi Nhánh Phạm Ngọc Thạch',
+    district: 'Quận 3',
+    tagline: 'Biệt Thự Pháp Cổ & 15 Phòng VIP Đẳng Cấp',
+    totalVip: 15,
+    totalCapacity: '160 khách',
+    photos: [
+      {
+        id: 'pnt-1',
+        title: 'Phòng VIP Ngoại Giao Tổng Thống',
+        type: 'VIP',
+        typeLabel: 'Phòng VIP Đẳng Cấp',
+        capacity: '30 - 45 khách',
+        features: ['Máy lạnh công suất lớn', 'Bàn tròn xoay tự động', 'Âm thanh biểu diễn', 'Kệ vang cao cấp'],
+        description: 'Kiến trúc biệt thự Pháp cổ điển trang trọng, cách âm tuyệt đối, dành riêng cho các buổi tiếp đãi ngoại giao và ký kết hợp đồng thương mại quan trọng.',
+        image: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'pnt-2',
+        title: 'Phòng VIP Biệt Thự Gỗ Trầm Cổ Điển',
+        type: 'VIP',
+        typeLabel: 'Phòng VIP Thân Mật',
+        capacity: '15 - 25 khách',
+        features: ['Nội thất gỗ tự nhiên', 'Hoa tươi nghệ thuật', 'Đội ngũ phục vụ chuyên biệt'],
+        description: 'Gam màu gỗ trầm ấm cúng kết hợp tranh nghệ thuật ba miền mang lại cảm giác thân thuộc, tĩnh lặng cho những cuộc gặp gỡ thân tình.',
+        image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'pnt-3',
+        title: 'Phòng VIP Gia Đình Sum Vầy',
+        type: 'VIP',
+        typeLabel: 'Phòng VIP Gia Đình',
+        capacity: '10 - 16 khách',
+        features: ['Không gian kín đáo', 'Ghế đệm êm ái', 'Bàn xoay thông minh'],
+        description: 'Không gian ấm áp dành riêng cho các dịp kỷ niệm ngày cưới, sinh nhật ông bà và họp mặt đại gia đình ngày cuối tuần.',
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'pnt-4',
+        title: 'Sảnh Trệt Biệt Thự Pháp Hoài Niệm',
+        type: 'SANH_TIEC',
+        typeLabel: 'Sảnh Tiệc Ấm Cúng',
+        capacity: '40 - 60 khách',
+        features: ['Cửa vòm kiến trúc Pháp', 'Ánh sáng vàng dịu', 'Bàn tiệc dài linh hoạt'],
+        description: 'Kiến trúc thuộc địa Pháp giao thoa với nét mộc đồng quê Việt Nam, không gian mở thoáng đãng nhìn ra rặng tre xanh mát.',
+        image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'pnt-5',
+        title: 'Khu Bàn Tiệc Hội Ngộ Bạn Bè',
+        type: 'BAN_TIEC',
+        typeLabel: 'Khu Bàn Tiệc',
+        capacity: '8 - 20 khách',
+        features: ['Bàn gỗ tự nhiên', 'Không gian thoáng mát', 'Phục vụ nhanh chóng'],
+        description: 'Điểm hẹn lý tưởng cho những bữa cơm trưa cùng đồng nghiệp hay buổi tối nâng ly chúc mừng rôm rả.',
+        image: 'https://images.unsplash.com/photo-1525610553991-2bede1a236e2?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+  },
+  {
+    branchCode: 'QN_TT',
+    branchName: 'Chi Nhánh Thành Thái',
+    district: 'Quận 10',
+    tagline: 'Ốc Đảo Sinh Thái Sân Vườn & Sảnh Tiệc 250 Khách',
+    totalVip: 18,
+    totalCapacity: '250 khách',
+    photos: [
+      {
+        id: 'tt-1',
+        title: 'Đại Sảnh Tiệc Sân Vườn Sinh Thái',
+        type: 'SANH_TIEC',
+        typeLabel: 'Sảnh Tiệc Quy Mô Lớn',
+        capacity: '150 - 250 khách',
+        features: ['Sân khấu lớn có màn hình LED', 'Dàn âm thanh biểu diễn', 'Không gian cây xanh rợp bóng', 'Bãi đỗ ô tô rộng'],
+        description: 'Ốc đảo sinh thái ngàn mét vuông rợp bóng mát, lý tưởng cho các buổi tiệc Tất niên công ty, hội nghị khách hàng và đại tiệc báo hỷ.',
+        image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'tt-2',
+        title: 'Khu Sân Vườn Thác Nước & Hồ Cảnh Quan',
+        type: 'SAN_VUON',
+        typeLabel: 'Sân Vườn Sinh Thái',
+        capacity: '60 - 100 khách',
+        features: ['Hồ cảnh quan mát rượi', 'Gió trời tự nhiên', 'Rợp bóng cây xanh'],
+        description: 'Hòa mình vào thiên nhiên trong lành giữa lòng phố thị Sài Gòn, tận hưởng không khí miệt vườn sông nước sảng khoái.',
+        image: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'tt-3',
+        title: 'Phòng VIP Lầu Cao View Trọn Sân Vườn',
+        type: 'VIP',
+        typeLabel: 'Phòng VIP Lầu Cao',
+        capacity: '20 - 35 khách',
+        features: ['Cửa kính panorama view vườn', 'Máy lạnh mát rượi', 'Cách âm tiêu chuẩn cao'],
+        description: 'Tận hưởng trọn vẹn cảnh sắc xanh tươi từ trên cao trong không gian máy lạnh mát lành và riêng tư tuyệt đối.',
+        image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'tt-4',
+        title: 'Dãy Bàn Tiệc Sinh Thái Ngoài Trời',
+        type: 'BAN_TIEC',
+        typeLabel: 'Khu Bàn Ngoài Trời',
+        capacity: '10 - 30 khách',
+        features: ['Mái che linh hoạt', 'Gió trời thoáng đãng', 'Đèn lồng ấm cúng'],
+        description: 'Bàn dài kết hợp linh hoạt cho các bữa tiệc liên hoan phòng ban, họp mặt bạn bè vừa nhâm nhi đặc sản vừa chuyện trò thoải mái.',
+        image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'tt-5',
+        title: 'Phòng Tiệc Thôi Nôi & Sinh Nhật Gia Đình',
+        type: 'VIP',
+        typeLabel: 'Phòng Tiệc Chủ Đề',
+        capacity: '25 - 45 khách',
+        features: ['Backdrop trang trí hoa/bóng', 'Dàn karaoke gia đình', 'Bàn tròn ấm cúng'],
+        description: 'Nơi lưu giữ những khoảnh khắc đáng nhớ của gia đình trong các dịp thôi nôi, sinh nhật, mừng thọ với đội ngũ trang trí tận tâm.',
+        image: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+  },
+  {
+    branchCode: 'QN_NTB',
+    branchName: 'Chi Nhánh Nguyễn Thái Bình',
+    district: 'Tân Bình',
+    tagline: 'Cửa Ngõ Sân Bay & 12 Phòng VIP Hiện Đại',
+    totalVip: 12,
+    totalCapacity: '180 khách',
+    photos: [
+      {
+        id: 'ntb-1',
+        title: 'Sảnh Hội Nghị & Tiệc Đón Tiếp Đối Tác',
+        type: 'SANH_TIEC',
+        typeLabel: 'Sảnh Hội Nghị Đa Năng',
+        capacity: '80 - 140 khách',
+        features: ['Màn chiếu máy chiếu sắc nét', 'Dàn âm thanh biểu diễn', 'Gần sân bay Tân Sơn Nhất'],
+        description: 'Vị trí chiến lược ngay cửa ngõ sân bay, cực kỳ thuận tiện đón tiếp các phái đoàn doanh nghiệp, đối tác tỉnh xa và tổ chức tiệc hội nghị tổng kết.',
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'ntb-2',
+        title: 'Phòng VIP Doanh Nhân Hiện Đại',
+        type: 'VIP',
+        typeLabel: 'Phòng VIP Hiện Đại',
+        capacity: '15 - 25 khách',
+        features: ['Nội thất sang trọng', 'Bàn tiệc gỗ cao cấp', 'Cách âm tiêu chuẩn'],
+        description: 'Thiết kế tinh gọn, trang nhã, tạo không khí tin cậy và chuyên nghiệp cho các cuộc đàm phán thương mại quan trọng.',
+        image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'ntb-3',
+        title: 'Phòng VIP Bàn Tròn Thân Mật',
+        type: 'VIP',
+        typeLabel: 'Phòng VIP Gia Đình',
+        capacity: '10 - 15 khách',
+        features: ['Bàn xoay thông minh', 'Ánh sáng vàng ấm', 'Máy lạnh riêng biệt'],
+        description: 'Không gian tĩnh lặng, tách biệt khỏi sự nhộn nhịp của đường phố, mang đến bữa tiệc sum vầy thân mật cho người thân.',
+        image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        id: 'ntb-4',
+        title: 'Khu Bàn Tiệc Trung Tâm Ấm Áp',
+        type: 'BAN_TIEC',
+        typeLabel: 'Khu Bàn Sảnh Trung Tâm',
+        capacity: '30 - 50 khách',
+        features: ['Bàn ghế bố trí linh hoạt', 'Phục vụ nhanh chóng', 'Không gian thoáng mát'],
+        description: 'Thích hợp cho tiệc liên hoan công ty năng động, các buổi họp mặt bạn bè phương xa hạ cánh sân bay ghé quán ăn bữa cơm quê đậm đà.',
+        image: 'https://images.unsplash.com/photo-1525610553991-2bede1a236e2?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
   },
 ];

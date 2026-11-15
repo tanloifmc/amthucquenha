@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -32,6 +32,11 @@ import {
   XCircle,
   RotateCcw,
   ShieldAlert,
+  Eye,
+  Copy,
+  Check,
+  RefreshCw,
+  Printer,
 } from 'lucide-react';
 import {
   BookingRecord,
@@ -41,7 +46,12 @@ import {
   INITIAL_DEPOSITS,
   INITIAL_CUSTOMERS,
   formatCustomerCode,
+  generateBookingCode,
 } from '@/services/crmService';
+import {
+  floorService,
+  INITIAL_ROOMS_TABLES,
+} from '@/services/floorService';
 
 const STAGES = [
   { id: 'NEW', label: '1. Mới Nhận', color: 'border-blue-500', bgHeader: 'bg-blue-50 text-blue-700' },
@@ -56,11 +66,13 @@ function KanbanColumn({
   bookings,
   onOpenDepositModal,
   onOpenCancelModal,
+  onViewDetails,
 }: {
   stage: (typeof STAGES)[number];
   bookings: BookingRecord[];
   onOpenDepositModal: (booking: BookingRecord) => void;
   onOpenCancelModal: (booking: BookingRecord) => void;
+  onViewDetails: (booking: BookingRecord) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: stage.id,
@@ -111,6 +123,7 @@ function KanbanColumn({
               booking={booking}
               onOpenDepositModal={onOpenDepositModal}
               onOpenCancelModal={onOpenCancelModal}
+              onViewDetails={onViewDetails}
             />
           ))
         )}
@@ -124,10 +137,12 @@ function KanbanCard({
   booking,
   onOpenDepositModal,
   onOpenCancelModal,
+  onViewDetails,
 }: {
   booking: BookingRecord;
   onOpenDepositModal: (booking: BookingRecord) => void;
   onOpenCancelModal: (booking: BookingRecord) => void;
+  onViewDetails: (booking: BookingRecord) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: String(booking.id),
@@ -148,16 +163,22 @@ function KanbanCard({
       }`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div>
+        <div className="cursor-pointer" onClick={() => onViewDetails(booking)}>
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] font-mono font-bold text-[#8B1D24] bg-[#F7EAEB] px-1.5 py-0.5 rounded">
+            <span
+              className="text-[11px] font-mono font-bold text-[#8B1D24] bg-[#F7EAEB] px-2 py-0.5 rounded border border-[#8B1D24]/20 hover:bg-[#8B1D24] hover:text-white transition-colors"
+              title="Click xem chi tiết tiệc"
+            >
               {booking.booking_code}
             </span>
-            <span className="text-[10px] font-mono font-bold text-[#6B5E55] bg-[#F0EAE1] px-1.5 py-0.5 rounded" title="Mã Khách Hàng (Định danh theo SĐT)">
+            <span
+              className="text-[10px] font-mono font-bold text-[#6B5E55] bg-[#F0EAE1] px-1.5 py-0.5 rounded"
+              title="Mã Khách Hàng (Định danh theo SĐT)"
+            >
               {booking.customer_code || `KH-${booking.customer_phone.replace(/\D/g, '')}`}
             </span>
           </div>
-          <h4 className="text-sm font-bold text-[#231F20] mt-1 leading-snug">
+          <h4 className="text-sm font-bold text-[#231F20] mt-1 leading-snug hover:text-[#8B1D24] transition-colors">
             {booking.customer_name}
           </h4>
           {booking.company_name && (
@@ -177,7 +198,10 @@ function KanbanCard({
         </div>
       </div>
 
-      <div className="space-y-1.5 text-xs text-[#554A41] bg-[#FAF7F2] p-2.5 rounded-lg border border-[#E8E2D9]/70 mb-2.5">
+      <div
+        className="space-y-1.5 text-xs text-[#554A41] bg-[#FAF7F2] p-2.5 rounded-lg border border-[#E8E2D9]/70 mb-2.5 cursor-pointer hover:border-[#8B1D24]/40 transition-colors"
+        onClick={() => onViewDetails(booking)}
+      >
         <div className="flex items-center justify-between font-semibold">
           <span className="text-[#8B1D24]">{booking.room_name}</span>
           <span className="text-xs px-2 py-0.5 rounded bg-white border border-[#D5C9BC] font-bold">
@@ -203,7 +227,16 @@ function KanbanCard({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Nút Xem Chi Tiết Tiệc Nhanh */}
+          <button
+            onClick={() => onViewDetails(booking)}
+            className="p-1 rounded text-[#6B5E55] hover:text-[#8B1D24] hover:bg-[#FAF7F2] transition-colors"
+            title="Xem chi tiết tiệc & thực đơn"
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </button>
+
           {booking.stage === 'DEPOSITED' ? (
             <div className="text-right">
               <div className="text-[10px] text-[#2A7238] font-bold">Đã cọc:</div>
@@ -239,6 +272,11 @@ export default function BookingsPipelinePage() {
   const [bookings, setBookings] = useState<BookingRecord[]>(INITIAL_BOOKINGS);
   const [deposits, setDeposits] = useState<DepositRecord[]>(INITIAL_DEPOSITS);
   const [activeDragBooking, setActiveDragBooking] = useState<BookingRecord | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Modal Chi Tiết Tiệc 360°
+  const [selectedDetailBooking, setSelectedDetailBooking] = useState<BookingRecord | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   // Bộ lọc
   const [selectedBranch, setSelectedBranch] = useState<string>('all');
@@ -269,9 +307,42 @@ export default function BookingsPipelinePage() {
   const [newEventDate, setNewEventDate] = useState('2026-11-25');
   const [newTimeSlot, setNewTimeSlot] = useState<'LUNCH' | 'DINNER' | 'FULL_DAY'>('DINNER');
   const [newGuestCount, setNewGuestCount] = useState(25);
-  const [newRoomName, setNewRoomName] = useState('Phòng VIP Sen Trắng');
+  const [selectedRoomId, setSelectedRoomId] = useState<number>(1);
+  const [newRoomName, setNewRoomName] = useState('Phòng VIP Sen Trắng (VIP 01)');
   const [newEstimatedBudget, setNewEstimatedBudget] = useState(20000000);
+  const [createBookingError, setCreateBookingError] = useState<string>('');
   const [detectedVipCustomer, setDetectedVipCustomer] = useState<CustomerRecord | null>(null);
+
+  // Tải và đồng bộ hóa danh sách tiệc từ API & localStorage
+  const fetchBookings = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/bookings');
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+        let localBookings: BookingRecord[] = [];
+        try {
+          const stored = localStorage.getItem('quenha_crm_bookings');
+          if (stored) localBookings = JSON.parse(stored);
+        } catch (e) {}
+
+        const map = new Map<string, BookingRecord>();
+        json.data.forEach((b: BookingRecord) => map.set(b.booking_code, b));
+        localBookings.forEach((b: BookingRecord) => {
+          if (!map.has(b.booking_code)) map.set(b.booking_code, b);
+        });
+        setBookings(Array.from(map.values()));
+      }
+    } catch (err) {
+      console.warn('Lỗi đồng bộ danh sách tiệc:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -374,6 +445,16 @@ export default function BookingsPipelinePage() {
         )
       );
 
+      // Cập nhật selectedDetailBooking nếu đang xem chi tiết tiệc này
+      if (selectedDetailBooking && selectedDetailBooking.id === depositTargetBooking.id) {
+        setSelectedDetailBooking({
+          ...selectedDetailBooking,
+          stage: 'DEPOSITED',
+          estimated_budget: Number(updatedBudget),
+          total_deposited: selectedDetailBooking.total_deposited + Number(depositAmount),
+        });
+      }
+
       setDepositTargetBooking(null);
     }
   };
@@ -382,35 +463,61 @@ export default function BookingsPipelinePage() {
   const handleConfirmCancelBooking = (e: React.FormEvent) => {
     e.preventDefault();
     if (cancelTargetBooking) {
-      setBookings((prev) =>
-        prev.map((b) =>
-          b.id === cancelTargetBooking.id
-            ? {
-                ...b,
-                stage: 'CANCELLED',
-                cancel_reason: `${cancelReason} (${refundOption === 'BAO_LUU' ? 'Bảo lưu cọc dời ngày' : refundOption === 'HOAN_COC' ? 'Hoàn cọc' : 'Mất cọc theo quy định'})`,
-              }
-            : b
-        )
+      // 1. GIẢI PHÓNG PHÒNG MA TRÊN SƠ ĐỒ MẶT BẰNG NGAY LẬP TỨC
+      floorService.releaseLocksByBookingId(cancelTargetBooking.id);
+
+      const updated = bookings.map((b) =>
+        b.id === cancelTargetBooking.id
+          ? {
+              ...b,
+              stage: 'CANCELLED' as const,
+              cancel_reason: `${cancelReason} (${refundOption === 'BAO_LUU' ? 'Bảo lưu cọc dời ngày' : refundOption === 'HOAN_COC' ? 'Hoàn cọc' : 'Mất cọc theo quy định'})`,
+            }
+          : b
       );
+
+      setBookings(updated);
+      try {
+        localStorage.setItem('quenha_crm_bookings', JSON.stringify(updated));
+      } catch (e) {}
+
+      if (selectedDetailBooking && selectedDetailBooking.id === cancelTargetBooking.id) {
+        setSelectedDetailBooking({
+          ...selectedDetailBooking,
+          stage: 'CANCELLED',
+          cancel_reason: `${cancelReason} (${refundOption === 'BAO_LUU' ? 'Bảo lưu cọc dời ngày' : refundOption === 'HOAN_COC' ? 'Hoàn cọc' : 'Mất cọc theo quy định'})`,
+        });
+      }
+
       setCancelTargetBooking(null);
     }
   };
 
-  // Tạo đặt tiệc mới
+  // Tạo đặt tiệc mới với Mã Tiệc chuẩn: [Mã chi nhánh]-[ddmmyyyy]-[001]
   const handleCreateBooking = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCustomerName.trim() || !newCustomerPhone.trim()) return;
 
+    // 1. Kiểm tra va chạm phòng theo ca (Collision Check chống trùng phòng)
+    const collision = floorService.checkCollision(selectedRoomId, newEventDate, newTimeSlot);
+    if (collision.isConflict) {
+      setCreateBookingError(collision.reason || 'Phòng đã có tiệc trong ca này!');
+      return;
+    }
+    setCreateBookingError('');
+
+    const branchId = newBranch.includes('Thành Thái') ? 2 : newBranch.includes('Nguyễn Thái Bình') ? 3 : 1;
+    const generatedCode = generateBookingCode(newBranch, newEventDate, bookings);
+
     const newBooking: BookingRecord = {
       id: Date.now(),
-      booking_code: `BK-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 900) + 100)}`,
+      booking_code: generatedCode,
       customer_id: Date.now(),
       customer_code: formatCustomerCode(newCustomerPhone.trim()),
       customer_name: newCustomerName.trim(),
       customer_phone: newCustomerPhone.trim(),
       company_name: newCompanyName.trim() || undefined,
-      branch_id: 1,
+      branch_id: branchId,
       branch_name: newBranch,
       event_type: 'TIEC_CONG_TY',
       event_type_label: 'Tiệc Đặt Mới',
@@ -418,7 +525,7 @@ export default function BookingsPipelinePage() {
       time_slot: newTimeSlot,
       guest_count: Number(newGuestCount),
       room_name: newRoomName,
-      table_room_id: 1,
+      table_room_id: selectedRoomId,
       estimated_budget: Number(newEstimatedBudget),
       total_deposited: 0,
       stage: 'NEW',
@@ -426,11 +533,34 @@ export default function BookingsPipelinePage() {
       created_at: new Date().toISOString().split('T')[0],
     };
 
-    setBookings([newBooking, ...bookings]);
+    // 2. Tự động giữ phòng trên sơ đồ mặt bằng
+    floorService.addLock({
+      table_room_id: selectedRoomId,
+      booking_id: newBooking.id,
+      booking_date: newEventDate,
+      time_slot: newTimeSlot,
+      lock_status: 'HOLD',
+      customer_name: newCustomerName.trim(),
+      guest_count: Number(newGuestCount),
+    });
+
+    const updatedList = [newBooking, ...bookings];
+    setBookings(updatedList);
+    try {
+      localStorage.setItem('quenha_crm_bookings', JSON.stringify(updatedList));
+    } catch (e) {}
+
     setShowCreateModal(false);
     setNewCustomerName('');
     setNewCustomerPhone('');
     setDetectedVipCustomer(null);
+  };
+
+  // Sao chép mã tiệc nhanh vào clipboard
+  const handleCopyBookingCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   // Lọc tiệc theo bộ lọc và chế độ Active/Cancelled
@@ -468,20 +598,32 @@ export default function BookingsPipelinePage() {
             </span>
           </div>
           <p className="text-sm text-[#6B5E55] mt-1">
-            Theo dõi tiến trình tiệc từ lúc nhận Lead đến khi chốt cọc nhiều đợt và hoàn tất tiệc.
+            Quy chuẩn mã tiệc: <code className="bg-[#FAF7F2] text-[#8B1D24] font-bold px-1.5 py-0.5 rounded border border-[#E8E2D9]">[MãCN]-[ddmmyyyy]-[001]</code> (PNT: Q.3, TT: Q.10, NTB: Tân Bình).
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setShowCreateModal(true);
-            setDetectedVipCustomer(null);
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B1D24] text-white font-bold text-sm shadow-xs hover:bg-[#72161C] transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tiếp Nhận Đặt Tiệc Mới</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={fetchBookings}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#D5C9BC] bg-white text-[#6B5E55] hover:text-[#8B1D24] hover:bg-[#FAF7F2] text-xs font-bold transition-all shadow-xs"
+            title="Đồng bộ danh sách tiệc từ hệ thống"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#8B1D24]' : ''}`} />
+            <span>Làm Mới</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setShowCreateModal(true);
+              setDetectedVipCustomer(null);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B1D24] text-white font-bold text-sm shadow-xs hover:bg-[#72161C] transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tiếp Nhận Đặt Tiệc Mới</span>
+          </button>
+        </div>
       </div>
 
       {/* Thanh bộ lọc & Thống kê nhanh */}
@@ -534,11 +676,19 @@ export default function BookingsPipelinePage() {
           <div className="flex items-center gap-2">
             <input
               type="text"
-              placeholder="Tìm theo Tên hoặc SĐT khách..."
+              placeholder="Tìm theo Mã tiệc (PNT-..., TT-...), Tên, SĐT..."
               value={searchPhone}
               onChange={(e) => setSearchPhone(e.target.value)}
-              className="text-xs border border-[#D5C9BC] rounded-lg px-3 py-1.5 w-56 focus:outline-none focus:border-[#8B1D24]"
+              className="text-xs border border-[#D5C9BC] rounded-lg px-3 py-1.5 w-72 focus:outline-none focus:border-[#8B1D24]"
             />
+            {searchPhone && (
+              <button
+                onClick={() => setSearchPhone('')}
+                className="text-xs text-[#A09383] hover:text-[#231F20]"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
@@ -569,6 +719,7 @@ export default function BookingsPipelinePage() {
                 bookings={filteredBookings.filter((b) => b.stage === stage.id)}
                 onOpenDepositModal={handleOpenDepositModal}
                 onOpenCancelModal={(b) => setCancelTargetBooking(b)}
+                onViewDetails={(b) => setSelectedDetailBooking(b)}
               />
             ))}
           </div>
@@ -579,6 +730,7 @@ export default function BookingsPipelinePage() {
                 booking={activeDragBooking}
                 onOpenDepositModal={() => {}}
                 onOpenCancelModal={() => {}}
+                onViewDetails={() => {}}
               />
             ) : null}
           </DragOverlay>
@@ -923,6 +1075,13 @@ export default function BookingsPipelinePage() {
                 />
               </div>
 
+              {createBookingError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                  <span>{createBookingError}</span>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
@@ -930,7 +1089,17 @@ export default function BookingsPipelinePage() {
                   </label>
                   <select
                     value={newBranch}
-                    onChange={(e) => setNewBranch(e.target.value)}
+                    onChange={(e) => {
+                      const branch = e.target.value;
+                      setNewBranch(branch);
+                      const bId = branch.includes('Thành Thái') ? 2 : branch.includes('Nguyễn Thái Bình') ? 3 : 1;
+                      const branchRooms = INITIAL_ROOMS_TABLES.filter((r) => r.branch_id === bId);
+                      if (branchRooms.length > 0) {
+                        setSelectedRoomId(branchRooms[0].id);
+                        setNewRoomName(branchRooms[0].name);
+                      }
+                      setCreateBookingError('');
+                    }}
                     className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white"
                   >
                     <option value="Quê Nhà - Phạm Ngọc Thạch">Phạm Ngọc Thạch (Q3)</option>
@@ -945,7 +1114,10 @@ export default function BookingsPipelinePage() {
                   </label>
                   <select
                     value={newTimeSlot}
-                    onChange={(e) => setNewTimeSlot(e.target.value as 'LUNCH' | 'DINNER' | 'FULL_DAY')}
+                    onChange={(e) => {
+                      setNewTimeSlot(e.target.value as 'LUNCH' | 'DINNER' | 'FULL_DAY');
+                      setCreateBookingError('');
+                    }}
                     className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white"
                   >
                     <option value="LUNCH">Ca Trưa (10:30 - 14:00)</option>
@@ -964,7 +1136,10 @@ export default function BookingsPipelinePage() {
                     type="date"
                     required
                     value={newEventDate}
-                    onChange={(e) => setNewEventDate(e.target.value)}
+                    onChange={(e) => {
+                      setNewEventDate(e.target.value);
+                      setCreateBookingError('');
+                    }}
                     className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2"
                   />
                 </div>
@@ -996,15 +1171,28 @@ export default function BookingsPipelinePage() {
 
               <div>
                 <label className="block text-xs font-bold text-[#6B5E55] uppercase mb-1">
-                  Phòng VIP / Sảnh dự kiến
+                  Chọn Phòng VIP / Bàn / Sảnh Tổ Chức *
                 </label>
-                <input
-                  type="text"
-                  placeholder="Vd: Phòng VIP Sen Trắng (VIP 01)"
-                  value={newRoomName}
-                  onChange={(e) => setNewRoomName(e.target.value)}
-                  className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2"
-                />
+                <select
+                  value={selectedRoomId}
+                  onChange={(e) => {
+                    const rId = Number(e.target.value);
+                    setSelectedRoomId(rId);
+                    const r = INITIAL_ROOMS_TABLES.find((room) => room.id === rId);
+                    if (r) setNewRoomName(r.name);
+                    setCreateBookingError('');
+                  }}
+                  className="w-full text-xs border border-[#D5C9BC] rounded-lg px-3 py-2 bg-white"
+                >
+                  {INITIAL_ROOMS_TABLES.filter((r) => {
+                    const bId = newBranch.includes('Thành Thái') ? 2 : newBranch.includes('Nguyễn Thái Bình') ? 3 : 1;
+                    return r.branch_id === bId;
+                  }).map((room) => (
+                    <option key={room.id} value={room.id}>
+                      {room.name} ({room.room_type_label} - Sức chứa: {room.capacity_min}-{room.capacity_max} khách)
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E8E2D9]">
@@ -1023,6 +1211,255 @@ export default function BookingsPipelinePage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: CHI TIẾT TIỆC KHÁCH HÀNG 360° (THEO CHỈ ĐẠO CỦA ANH LỢI: NHÌN MÃ SEARCH RA VÀ XEM CHI TIẾT) */}
+      {selectedDetailBooking && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-[#E8E2D9] animate-in fade-in max-h-[92vh] flex flex-col">
+            {/* Header Modal Chi Tiết */}
+            <div className="flex items-start justify-between border-b border-[#E8E2D9] pb-4 mb-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="font-mono text-base font-black text-[#8B1D24] bg-[#F7EAEB] px-3 py-1 rounded-lg border border-[#8B1D24]/30 flex items-center gap-2">
+                    <span>{selectedDetailBooking.booking_code}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyBookingCode(selectedDetailBooking.booking_code)}
+                      className="p-1 hover:bg-[#8B1D24]/10 rounded transition-colors text-xs text-[#8B1D24]"
+                      title="Sao chép mã tiệc"
+                    >
+                      {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </span>
+
+                  <span className="text-xs font-mono font-bold text-[#6B5E55] bg-[#F0EAE1] px-2 py-1 rounded">
+                    {selectedDetailBooking.customer_code || `KH-${selectedDetailBooking.customer_phone.replace(/\D/g, '')}`}
+                  </span>
+
+                  <span
+                    className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                      selectedDetailBooking.stage === 'DEPOSITED'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : selectedDetailBooking.stage === 'QUOTED'
+                        ? 'bg-amber-100 text-amber-800'
+                        : selectedDetailBooking.stage === 'COMPLETED'
+                        ? 'bg-purple-100 text-purple-800'
+                        : selectedDetailBooking.stage === 'CANCELLED'
+                        ? 'bg-rose-100 text-rose-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}
+                  >
+                    {selectedDetailBooking.stage === 'NEW'
+                      ? '1. Mới Nhận'
+                      : selectedDetailBooking.stage === 'QUOTED'
+                      ? '2. Đã Báo Giá'
+                      : selectedDetailBooking.stage === 'DEPOSITED'
+                      ? '3. Đã Cọc Tiệc'
+                      : selectedDetailBooking.stage === 'COMPLETED'
+                      ? '4. Hoàn Tất'
+                      : 'Đã Hủy'}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-[#231F20]">
+                  {selectedDetailBooking.customer_name}{' '}
+                  {selectedDetailBooking.company_name && (
+                    <span className="text-xs font-normal text-[#6B5E55]">
+                      ({selectedDetailBooking.company_name})
+                    </span>
+                  )}
+                </h3>
+              </div>
+
+              <button
+                onClick={() => setSelectedDetailBooking(null)}
+                className="text-[#A09383] hover:text-[#231F20] text-sm font-bold p-1 rounded-lg hover:bg-[#F5EFE6]"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Nội dung chi tiết cuộn */}
+            <div className="space-y-4 overflow-y-auto pr-1 flex-1 text-xs">
+              {/* Lưới 4 ô tóm tắt chính */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9]">
+                  <div className="text-[10px] uppercase font-bold text-[#A09383]">Chi Nhánh</div>
+                  <div className="text-xs font-bold text-[#8B1D24] mt-0.5 truncate">
+                    {selectedDetailBooking.branch_name}
+                  </div>
+                </div>
+                <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9]">
+                  <div className="text-[10px] uppercase font-bold text-[#A09383]">Ngày & Ca Tiệc</div>
+                  <div className="text-xs font-bold text-[#231F20] mt-0.5">
+                    {selectedDetailBooking.booking_date} (
+                    {selectedDetailBooking.time_slot === 'LUNCH'
+                      ? 'Trưa'
+                      : selectedDetailBooking.time_slot === 'DINNER'
+                      ? 'Tối'
+                      : 'Cả ngày'}
+                    )
+                  </div>
+                </div>
+                <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9]">
+                  <div className="text-[10px] uppercase font-bold text-[#A09383]">Phòng / Sảnh</div>
+                  <div className="text-xs font-bold text-[#231F20] mt-0.5 truncate">
+                    {selectedDetailBooking.room_name}
+                  </div>
+                </div>
+                <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9]">
+                  <div className="text-[10px] uppercase font-bold text-[#A09383]">Quy Mô</div>
+                  <div className="text-xs font-bold text-[#231F20] mt-0.5">
+                    {selectedDetailBooking.guest_count} khách
+                  </div>
+                </div>
+              </div>
+
+              {/* Thông tin liên hệ & người phụ trách */}
+              <div className="p-3.5 bg-white rounded-xl border border-[#E8E2D9] space-y-2">
+                <div className="font-bold text-[#8B1D24] uppercase text-[11px] flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>Thông Tin Liên Hệ & Phụ Trách</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-[#6B5E55]">Số điện thoại: </span>
+                    <strong className="font-mono text-[#231F20] text-sm">
+                      {selectedDetailBooking.customer_phone}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-[#6B5E55]">Nhân viên phụ trách: </span>
+                    <strong className="text-[#231F20]">
+                      {selectedDetailBooking.sales_rep_name || 'Lễ Tân Chi Nhánh'}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Thực đơn & Yêu cầu của khách */}
+              <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2D9] space-y-2">
+                <div className="font-bold text-[#8B1D24] uppercase text-[11px] flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Thực Đơn, Khẩu Vị & Yêu Cầu Đặc Biệt</span>
+                </div>
+                <p className="text-xs leading-relaxed text-[#231F20] bg-white p-2.5 rounded-lg border border-[#D5C9BC]">
+                  {selectedDetailBooking.special_requests || 'Khách chưa để lại yêu cầu thực đơn cụ thể. Nhân viên phụ trách sẽ gọi điện tư vấn trực tiếp.'}
+                </p>
+              </div>
+
+              {/* Bảng Tài Chính & Cọc */}
+              <div className="p-4 bg-white rounded-xl border border-[#D5C9BC] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="font-bold text-[#2A7238] uppercase text-[11px] flex items-center gap-1.5">
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Tài Chính & Cọc Tiệc</span>
+                  </div>
+                  {selectedDetailBooking.stage !== 'DEPOSITED' && selectedDetailBooking.stage !== 'COMPLETED' && selectedDetailBooking.stage !== 'CANCELLED' && (
+                    <button
+                      onClick={() => {
+                        handleOpenDepositModal(selectedDetailBooking);
+                      }}
+                      className="px-2.5 py-1 rounded bg-[#2A7238] text-white font-bold text-[11px] hover:bg-[#235d2e] transition-colors"
+                    >
+                      + Ghi Cọc Đợt Mới
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 p-3 bg-[#FAF7F2] rounded-lg text-center">
+                  <div>
+                    <div className="text-[10px] text-[#A09383] uppercase">Tổng Dự Toán</div>
+                    <div className="font-mono font-bold text-sm text-[#231F20] mt-0.5">
+                      {selectedDetailBooking.estimated_budget.toLocaleString('vi-VN')} đ
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-[#2A7238] uppercase font-bold">Đã Cọc Tích Lũy</div>
+                    <div className="font-mono font-bold text-sm text-[#2A7238] mt-0.5">
+                      {selectedDetailBooking.total_deposited.toLocaleString('vi-VN')} đ
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-[#C05621] uppercase font-bold">Còn Phải Thu</div>
+                    <div className="font-mono font-bold text-sm text-[#C05621] mt-0.5">
+                      {Math.max(0, selectedDetailBooking.estimated_budget - selectedDetailBooking.total_deposited).toLocaleString('vi-VN')} đ
+                    </div>
+                  </div>
+                </div>
+
+                {/* Danh sách phiếu cọc của tiệc */}
+                {deposits.filter((d) => d.booking_id === selectedDetailBooking.id).length > 0 && (
+                  <div className="space-y-1.5 pt-2 border-t border-[#E8E2D9]">
+                    <div className="text-[11px] font-bold text-[#6B5E55]">Lịch sử nộp cọc:</div>
+                    {deposits
+                      .filter((d) => d.booking_id === selectedDetailBooking.id)
+                      .map((dep) => (
+                        <div
+                          key={dep.id}
+                          className="flex items-center justify-between text-[11px] p-2 bg-white rounded border border-[#E8E2D9]"
+                        >
+                          <div>
+                            <span className="font-bold text-[#2A7238]">
+                              +{dep.amount.toLocaleString('vi-VN')} đ
+                            </span>{' '}
+                            <span className="text-[#6B5E55]">({dep.payment_method})</span> — {dep.note}
+                          </div>
+                          <div className="text-[10px] text-[#A09383]">{dep.created_at}</div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+
+                {selectedDetailBooking.cancel_reason && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800">
+                    <strong>⚠️ Lý do hủy tiệc:</strong> {selectedDetailBooking.cancel_reason}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer Modal Chi Tiết */}
+            <div className="flex items-center justify-between pt-3 border-t border-[#E8E2D9] mt-3">
+              <div className="text-[11px] text-[#A09383]">
+                Khách tạo lúc: {selectedDetailBooking.created_at}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert(`Đã gửi thông tin tiệc ${selectedDetailBooking.booking_code} cho Bếp & Phục vụ chi nhánh ${selectedDetailBooking.branch_name}`);
+                  }}
+                  className="px-3 py-1.5 text-xs font-bold text-[#6B5E55] border border-[#D5C9BC] hover:bg-[#FAF7F2] rounded-lg flex items-center gap-1.5"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Bàn Giao Bếp</span>
+                </button>
+
+                {selectedDetailBooking.stage !== 'CANCELLED' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCancelTargetBooking(selectedDetailBooking);
+                    }}
+                    className="px-3 py-1.5 text-xs font-bold text-[#991B1B] hover:bg-rose-50 rounded-lg"
+                  >
+                    Hủy Tiệc & Nhả Phòng
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDetailBooking(null)}
+                  className="px-4 py-1.5 text-xs font-bold text-white bg-[#8B1D24] hover:bg-[#72161C] rounded-lg"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

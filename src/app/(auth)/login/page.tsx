@@ -114,7 +114,7 @@ export default function LoginPage() {
         {/* Logo Quê Nhà Thật - Dáng Oval Tự Nhiên, Không Khung Bo Tròn */}
         <div className="flex flex-col items-center justify-center mb-5">
           <img
-            src="/logo-badge.png"
+            src="/logo-oval-transparent.png"
             alt="Ẩm Thực Quê Nhà - Không gian ẩm thực Việt"
             className="h-24 sm:h-28 w-auto object-contain drop-shadow-sm transition-transform hover:scale-105 duration-300"
           />

@@ -16,7 +16,7 @@ interface ConsultantRequest {
 }
 
 const SYSTEM_PROMPT = `
-Bạn là "Trợ Lý Đặt Tiệc Quê Nhà" — chuyên viên tư vấn ẩm thực và tiệc cao cấp của chuỗi Nhà Hàng Ẩm Thực Quê Nhà (Sài Gòn).
+Bạn là "Trợ Lý Đặt Tiệc Quê Nhà" — chuyên viên tư vấn ẩm thực và tiệc cao cấp của chuỗi Nhà Hàng Ẩm Thực Quê Nhà (Sài Gòn), thương hiệu thành lập từ năm 2010 với hơn 15 năm uy tín gìn giữ phong vị quê nhà.
 Văn phong của bạn: Ấm áp, nồng hậu, lịch thiệp, am hiểu sâu sắc văn hóa ẩm thực truyền thống Việt Nam.
 
 THÔNG TIN CHUỖI NHÀ HÀNG ẨM THỰC QUÊ NHÀ:
@@ -45,7 +45,7 @@ BẢNG GIÁ SET MENU THAM KHẢO (cho bàn 10 người):
 NHIỆM VỤ:
 1. Trả lời chu đáo, gợi ý món ăn và set menu phù hợp với số lượng khách và ngân sách của họ.
 2. Khuyên khách nên chọn chi nhánh nào thuận tiện nhất theo nhu cầu (VIP kín đáo chọn Q.3, Sân vườn rộng tiệc đông chọn Q.10, Gần sân bay chọn Tân Bình).
-3. Luôn khuyên khách bấm nút "Gửi Phiếu Nhận Tiệc" để Tổng Quản Lý và Lễ tân chi nhánh giữ phòng VIP đẹp nhất trước giờ cao điểm.
+3. Luôn khuyên khách bấm nút "Gửi Phiếu Nhận Tiệc" để Quê Nhà giữ phòng VIP đẹp nhất trước giờ cao điểm.
 4. Trả lời ngắn gọn, súc tích, định dạng gạch đầu dòng rõ ràng, không viết văn bản quá dài dòng.
 `;
 
@@ -91,20 +91,32 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Local Smart Fallback Engine: Trợ lý chuyên sâu F&B Quê Nhà nội bộ (không phụ thuộc mạng ngoại vi)
-    const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content.toLowerCase() || '';
+    const safeMessages = Array.isArray(messages) ? messages : [];
+    const lastUserMessage =
+      safeMessages.slice().reverse().find((m) => m.role === 'user')?.content.toLowerCase() ||
+      (body as any).prompt?.toLowerCase() ||
+      (body as any).eventType?.toLowerCase() ||
+      '';
     const fallbackResponse = generateLocalConsultantResponse(lastUserMessage, currentFormState);
 
     return NextResponse.json({
+      success: true,
       content: fallbackResponse,
+      consultation: fallbackResponse,
       provider: 'quenha-smart-local-engine',
+      hotline: '0938 226 166',
     });
   } catch (error: any) {
     console.error('[AI CONSULTANT HANDLER ERROR]', error);
     return NextResponse.json(
       {
+        success: true,
         content:
-          'Dạ em chào quý thực khách! Hiện tại hệ thống đang tiếp nhận nhiều lượt đặt tiệc. Quý khách vui lòng điền thông tin vào Phiếu Nhận Tiệc bên dưới hoặc gọi hotline trực tiếp 0938 226 166 để Tổng Quản Lý chi nhánh hỗ trợ ngay ạ!',
+          'Dạ em chào quý thực khách! Hiện tại hệ thống đang tiếp nhận nhiều lượt đặt tiệc. Quý khách vui lòng điền thông tin vào Phiếu Nhận Tiệc bên dưới hoặc gọi hotline trực tiếp 0938 226 166 để Quê Nhà hỗ trợ ngay ạ!',
+        consultation:
+          'Dạ em chào quý thực khách! Hiện tại hệ thống đang tiếp nhận nhiều lượt đặt tiệc. Quý khách vui lòng điền thông tin vào Phiếu Nhận Tiệc bên dưới hoặc gọi hotline trực tiếp 0938 226 166 để Quê Nhà hỗ trợ ngay ạ!',
         provider: 'fallback',
+        hotline: '0938 226 166',
       },
       { status: 200 }
     );
@@ -117,21 +129,21 @@ function generateLocalConsultantResponse(input: string, state?: any): string {
     return `Dạ chi nhánh **05 Thành Thái (Quận 10)** là lựa chọn tuyệt vời cho tiệc công ty và liên hoan gia đình!
 🌿 **Không gian:** Sân vườn xanh mát hàng ngàn m², có lầu VIP và sảnh lớn sức chứa tới 250 khách, bãi đậu xe hơi rộng rãi.
 🍲 **Món gợi ý:** Heo mẹt 4 món giòn da, Gà ta hấp lá chúc, Lẩu cua đồng bắp bò Quê Nhà.
-👉 Anh/chị có thể chọn **CN Thành Thái** trên phiếu đặt tiệc, nhân viên lễ tân sẽ ưu tiên giữ phòng VIP hoặc bàn sân vườn đẹp nhất cho mình ạ!`;
+👉 Anh/chị có thể chọn **CN Thành Thái** trên phiếu đặt tiệc, Quê Nhà sẽ ưu tiên giữ phòng VIP hoặc bàn sân vườn đẹp nhất cho mình ạ!`;
   }
 
   if (input.includes('phạm ngọc thạch') || input.includes('quận 3') || input.includes('q3')) {
     return `Dạ chi nhánh **28 Phạm Ngọc Thạch (Quận 3)** sở hữu kiến trúc biệt thự Pháp cổ kính và sang trọng bậc nhất chuỗi Quê Nhà!
 🏛️ **Không gian:** 15 phòng VIP máy lạnh riêng tư, cách âm tốt, phong cách trang nhã rất phù hợp tiếp khách VIP, ký kết hợp đồng hoặc tiệc gia đình cần không gian kín đáo.
 🍲 **Món gợi ý:** Cá lăng nướng muối ớt rừng, Bò tơ nướng than hoa, Chả giò Quê Nhà, Lẩu cá tầm măng chua.
-👉 Quý khách có thể điền số khách dự kiến, Tổng Quản Lý cơ sở Phạm Ngọc Thạch sẽ chuẩn bị phòng VIP riêng biệt kèm ly vang chu đáo ạ!`;
+👉 Quý khách có thể điền số khách dự kiến, Quê Nhà cơ sở Phạm Ngọc Thạch sẽ chuẩn bị phòng VIP riêng biệt kèm ly vang chu đáo ạ!`;
   }
 
   if (input.includes('nguyễn thái bình') || input.includes('tân bình') || input.includes('sân bay')) {
     return `Dạ chi nhánh **164 - 166 Nguyễn Thái Bình (Tân Bình)** tọa lạc ngay cửa ngõ sân bay Tân Sơn Nhất, cực kỳ tiện lợi!
 ✈️ **Không gian:** 12 phòng VIP hiện đại, sảnh hội nghị có trang bị máy chiếu, âm thanh chuyên nghiệp cho tiệc tổng kết công ty.
 🍲 **Món gợi ý:** Heo mẹt giòn da, Gỏi tép đồng bông điên điển, Tôm sú sốt trứng muối, Lẩu gà lá giang.
-👉 Anh/chị hãy bấm gửi phiếu, lễ tân chi nhánh Nguyễn Thái Bình sẽ gọi xác nhận và đón đoàn chu đáo ạ!`;
+👉 Anh/chị hãy bấm gửi phiếu, Quê Nhà sẽ gọi xác nhận và đón đoàn chu đáo ạ!`;
   }
 
   // Nhận diện ngân sách / giá tiền

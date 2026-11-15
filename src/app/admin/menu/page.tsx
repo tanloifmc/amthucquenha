@@ -58,25 +58,63 @@ export default function AdminMenuPage() {
   const [newSetDesc, setNewSetDesc] = useState('');
   const [newSetDishes, setNewSetDishes] = useState<string>('Gỏi khai vị, Heo mẹt giòn da, Cá nướng, Lẩu cua đồng, Tráng miệng');
 
+  // Load saved menu from localStorage
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedDishes = localStorage.getItem('quenha_custom_dishes');
+        if (storedDishes) {
+          const parsed = JSON.parse(storedDishes);
+          if (Array.isArray(parsed) && parsed.length > 0) setDishes(parsed);
+        }
+      } catch {}
+
+      try {
+        const storedSets = localStorage.getItem('quenha_custom_set_menus');
+        if (storedSets) {
+          const parsed = JSON.parse(storedSets);
+          if (Array.isArray(parsed) && parsed.length > 0) setSetMenus(parsed);
+        }
+      } catch {}
+    }
+  }, []);
+
+  const saveDishesToStorage = (updated: DishItem[]) => {
+    setDishes(updated);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('quenha_custom_dishes', JSON.stringify(updated));
+      } catch {}
+    }
+  };
+
+  const saveSetsToStorage = (updated: SetMenu[]) => {
+    setSetMenus(updated);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('quenha_custom_set_menus', JSON.stringify(updated));
+      } catch {}
+    }
+  };
+
   const handleSaveDish = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDishName.trim()) return;
 
     if (editingDish) {
-      setDishes(
-        dishes.map((d) =>
-          d.id === editingDish.id
-            ? {
-                ...d,
-                name: newDishName,
-                category: newDishCategory,
-                price: Number(newDishPrice),
-                description: newDishDesc,
-                badge: newDishBadge,
-              }
-            : d
-        )
+      const updated = dishes.map((d) =>
+        d.id === editingDish.id
+          ? {
+              ...d,
+              name: newDishName,
+              category: newDishCategory,
+              price: Number(newDishPrice),
+              description: newDishDesc,
+              badge: newDishBadge,
+            }
+          : d
       );
+      saveDishesToStorage(updated);
       setEditingDish(null);
     } else {
       const newItem: DishItem = {
@@ -88,7 +126,7 @@ export default function AdminMenuPage() {
         badge: newDishBadge,
         isSignature: newDishBadge.includes('SIGNATURE') || newDishBadge.includes('ĐẶC SẢN'),
       };
-      setDishes([newItem, ...dishes]);
+      saveDishesToStorage([newItem, ...dishes]);
     }
 
     setNewDishName('');
@@ -98,7 +136,7 @@ export default function AdminMenuPage() {
 
   const handleDeleteDish = (id: string) => {
     if (confirm('Anh/chị có chắc muốn xóa món này khỏi danh mục thực đơn?')) {
-      setDishes(dishes.filter((d) => d.id !== id));
+      saveDishesToStorage(dishes.filter((d) => d.id !== id));
     }
   };
 
@@ -112,20 +150,19 @@ export default function AdminMenuPage() {
       .filter((s) => s.length > 0);
 
     if (editingSet) {
-      setSetMenus(
-        setMenus.map((s) =>
-          s.id === editingSet.id
-            ? {
-                ...s,
-                name: newSetName,
-                pricePerTable: Number(newSetPrice),
-                badge: newSetBadge,
-                description: newSetDesc,
-                dishes: dishList,
-              }
-            : s
-        )
+      const updated = setMenus.map((s) =>
+        s.id === editingSet.id
+          ? {
+              ...s,
+              name: newSetName,
+              pricePerTable: Number(newSetPrice),
+              badge: newSetBadge,
+              description: newSetDesc,
+              dishes: dishList,
+            }
+          : s
       );
+      saveSetsToStorage(updated);
       setEditingSet(null);
     } else {
       const newSet: SetMenu = {
@@ -138,7 +175,7 @@ export default function AdminMenuPage() {
         suitableFor: 'Tiệc họp mặt / Liên hoan (Bàn 10 người)',
         dishes: dishList,
       };
-      setSetMenus([...setMenus, newSet]);
+      saveSetsToStorage([...setMenus, newSet]);
     }
 
     setNewSetName('');
@@ -148,7 +185,7 @@ export default function AdminMenuPage() {
 
   const handleDeleteSet = (id: string) => {
     if (confirm('Anh/chị có chắc muốn xóa Set Menu này khỏi trang Đặt Tiệc?')) {
-      setSetMenus(setMenus.filter((s) => s.id !== id));
+      saveSetsToStorage(setMenus.filter((s) => s.id !== id));
     }
   };
 

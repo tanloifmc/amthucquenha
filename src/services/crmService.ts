@@ -25,6 +25,61 @@ export function formatCustomerCode(phone: string): string {
   return cleaned ? `KH-${cleaned}` : '';
 }
 
+// Lấy mã viết tắt chi nhánh chuẩn Quê Nhà (PNT: Phạm Ngọc Thạch, TT: Thành Thái, NTB: Nguyễn Thái Bình)
+export function getBranchShortCode(branch: string | number | undefined): 'PNT' | 'TT' | 'NTB' {
+  if (typeof branch === 'number') {
+    if (branch === 2) return 'TT';
+    if (branch === 3) return 'NTB';
+    return 'PNT';
+  }
+  const str = String(branch || '').toUpperCase();
+  if (str.includes('TT') || str.includes('THÀNH THÁI') || str.includes('THANH THAI') || str.includes('QN_TT')) return 'TT';
+  if (str.includes('NTB') || str.includes('NGUYỄN THÁI BÌNH') || str.includes('NGUYEN THAI BINH') || str.includes('QN_NTB')) return 'NTB';
+  return 'PNT';
+}
+
+// Chuyển đổi ngày (YYYY-MM-DD hoặc ISO string) sang chuỗi ddmmyyyy chuẩn
+export function formatDateToDDMMYYYY(dateStr?: string): string {
+  if (!dateStr) {
+    const now = new Date();
+    const d = String(now.getDate()).padStart(2, '0');
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const y = now.getFullYear();
+    return `${d}${m}${y}`;
+  }
+  // Nếu đã ở dạng ddmmyyyy thì giữ nguyên
+  const clean = dateStr.replace(/\D/g, '');
+  if (clean.length === 8 && !dateStr.includes('-')) {
+    return clean;
+  }
+  const parts = dateStr.split('T')[0].split('-');
+  if (parts.length === 3) {
+    const y = parts[0];
+    const m = parts[1].padStart(2, '0');
+    const d = parts[2].padStart(2, '0');
+    return `${d}${m}${y}`;
+  }
+  const now = new Date();
+  return `${String(now.getDate()).padStart(2, '0')}${String(now.getMonth() + 1).padStart(2, '0')}${now.getFullYear()}`;
+}
+
+// Sinh mã tiệc chuẩn hóa: [Mã chi nhánh]-[ddmmyyyy]-[001]
+// Giúp nhân viên nhìn vào là biết ngay Chi nhánh, Ngày tiệc và Số thứ tự trong ngày, search ra tức thì
+export function generateBookingCode(
+  branch: string | number | undefined,
+  bookingDate?: string,
+  existingBookings: BookingRecord[] = INITIAL_BOOKINGS
+): string {
+  const branchCode = getBranchShortCode(branch);
+  const dateCode = formatDateToDDMMYYYY(bookingDate);
+  const prefix = `${branchCode}-${dateCode}-`;
+
+  // Đếm số lượng tiệc đã có cùng prefix trong ngày tại chi nhánh đó
+  const matchedCount = existingBookings.filter((b) => b.booking_code && b.booking_code.startsWith(prefix)).length;
+  const seq = String(matchedCount + 1).padStart(3, '0');
+  return `${prefix}${seq}`;
+}
+
 export interface BookingRecord {
   id: number;
   booking_code: string;
@@ -127,10 +182,15 @@ export const INITIAL_CUSTOMERS: CustomerRecord[] = [
   },
 ];
 
-export const INITIAL_BOOKINGS: BookingRecord[] = [
+const globalForCrm = globalThis as unknown as {
+  quenha_bookings?: BookingRecord[];
+};
+
+export const INITIAL_BOOKINGS: BookingRecord[] =
+  globalForCrm.quenha_bookings || [
   {
     id: 1,
-    booking_code: 'BK-202611-001',
+    booking_code: 'PNT-20112026-001',
     customer_id: 1,
     customer_code: 'KH-0903889912',
     customer_name: 'Nguyễn Thanh Tùng',
@@ -154,7 +214,7 @@ export const INITIAL_BOOKINGS: BookingRecord[] = [
   },
   {
     id: 2,
-    booking_code: 'BK-202611-002',
+    booking_code: 'TT-16112026-001',
     customer_id: 2,
     customer_code: 'KH-0918334556',
     customer_name: 'Trần Thị Mai Lan',
@@ -178,7 +238,7 @@ export const INITIAL_BOOKINGS: BookingRecord[] = [
   },
   {
     id: 3,
-    booking_code: 'BK-202611-003',
+    booking_code: 'NTB-18112026-001',
     customer_id: 3,
     customer_code: 'KH-0988776543',
     customer_name: 'Lê Hoàng Long',
@@ -202,13 +262,13 @@ export const INITIAL_BOOKINGS: BookingRecord[] = [
   },
   {
     id: 4,
-    booking_code: 'BK-202611-004',
+    booking_code: 'TT-08112026-001',
     customer_id: 4,
     customer_code: 'KH-0937112233',
     customer_name: 'Phạm Minh Đức',
     customer_phone: '0937 112 233',
     company_name: 'Ngân hàng Vietcombank CN Tân Định',
-    branch_id: 4,
+    branch_id: 2,
     branch_name: 'Quê Nhà - Thành Thái',
     event_type: 'TIEC_CONG_TY',
     event_type_label: 'Tiệc Tổng Kết Quý IV',
@@ -226,6 +286,10 @@ export const INITIAL_BOOKINGS: BookingRecord[] = [
   },
 ];
 
+if (!globalForCrm.quenha_bookings) {
+  globalForCrm.quenha_bookings = INITIAL_BOOKINGS;
+}
+
 export const INITIAL_DEPOSITS: DepositRecord[] = [
   {
     id: 1,
@@ -234,7 +298,7 @@ export const INITIAL_DEPOSITS: DepositRecord[] = [
     deposit_stage: 'COC_1_GIU_CHO',
     payment_method: 'CHUYEN_KHOAN',
     receipt_image_url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600',
-    note: 'VCB UNC số 984214 - Cọc giữ phòng VIP Sen Vàng ngày 20/11',
+    note: 'VCB UNC số 984214 - Cọc giữ phòng VIP Sen Vàng ngày 20/11 (Mã tiệc PNT-20112026-001)',
     created_by: 'Đoàn Văn Hậu',
     created_at: '2026-11-11 10:15',
   },
@@ -248,7 +312,7 @@ export const crmService = {
 
   // Lấy danh sách tiệc
   async getBookings(): Promise<BookingRecord[]> {
-    return INITIAL_BOOKINGS;
+    return globalForCrm.quenha_bookings || INITIAL_BOOKINGS;
   },
 
   // Lấy lịch sử cọc của tiệc
@@ -258,32 +322,37 @@ export const crmService = {
 
   // Thêm đơn đặt tiệc mới (từ Landing Page online hoặc Sales)
   async addBooking(booking: Partial<BookingRecord>): Promise<BookingRecord> {
-    const newId = INITIAL_BOOKINGS.length + 1;
+    const list = globalForCrm.quenha_bookings || INITIAL_BOOKINGS;
+    const newId = Date.now();
+    const branchTarget = booking.branch_id || booking.branch_name || 'PNT';
+    const dateTarget = booking.booking_date || new Date().toISOString().split('T')[0];
+    const generatedCode = booking.booking_code || generateBookingCode(branchTarget, dateTarget, list);
+
     const newBooking: BookingRecord = {
       id: newId,
-      booking_code: booking.booking_code || `BK-202611-${String(newId).padStart(3, '0')}`,
-      customer_id: booking.customer_id || 999,
+      booking_code: generatedCode,
+      customer_id: booking.customer_id || newId,
       customer_code: booking.customer_code || formatCustomerCode(booking.customer_phone || ''),
       customer_name: booking.customer_name || 'Khách Đặt Online',
       customer_phone: booking.customer_phone || '',
       company_name: booking.company_name || '',
       branch_id: booking.branch_id || 1,
-      branch_name: booking.branch_name || 'Chi Nhánh Quê Nhà',
+      branch_name: booking.branch_name || 'Quê Nhà - Phạm Ngọc Thạch',
       event_type: booking.event_type || 'TIEC_THAN_MAT',
       event_type_label: booking.event_type_label || 'Tiệc Thân Mật',
-      booking_date: booking.booking_date || new Date().toISOString().split('T')[0],
+      booking_date: dateTarget,
       time_slot: booking.time_slot || 'DINNER',
       guest_count: booking.guest_count || 10,
-      room_name: booking.room_name || 'Chưa gán phòng (Chờ TQL duyệt)',
+      room_name: booking.room_name || 'Chưa gán phòng (Chờ Quê Nhà xếp phòng)',
       table_room_id: booking.table_room_id || 0,
       estimated_budget: booking.estimated_budget || 0,
-      total_deposited: 0,
-      stage: 'NEW',
-      sales_rep_name: 'Tiếp Nhận Online',
+      total_deposited: booking.total_deposited || 0,
+      stage: booking.stage || 'NEW',
+      sales_rep_name: booking.sales_rep_name || 'Tiếp Nhận Online',
       special_requests: booking.special_requests || '',
       created_at: new Date().toISOString().split('T')[0],
     };
-    INITIAL_BOOKINGS.unshift(newBooking);
+    list.unshift(newBooking);
     return newBooking;
   },
 };
