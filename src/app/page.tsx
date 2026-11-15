@@ -37,6 +37,7 @@ import {
   Info,
   Camera,
   Images,
+  Star,
 } from 'lucide-react';
 import {
   BRANCHES_DATA,
@@ -50,7 +51,6 @@ import {
   BranchSpaceAlbum,
 } from '@/data/landingMenuData';
 import { Spotlight } from '@/components/ui/spotlight';
-import { CardContainer, CardBody, CardItem } from '@/components/ui/three-d-card';
 import { MovingBorderButton } from '@/components/ui/moving-border';
 import { MarqueeRibbon } from '@/components/ui/marquee-ribbon';
 
@@ -504,51 +504,51 @@ export default function LandingBanquetPage() {
 
       {/* 2. THANH ĐIỀU HƯỚNG CHÍNH (LUXURY NAVBAR) */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E8E2D9] shadow-xs">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-          {/* Logo Quê Nhà Oval Tự Nhiên */}
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3.5 group">
-            <div className="relative h-11 sm:h-14 w-auto transition-transform group-hover:scale-105 flex items-center">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+          {/* Logo Quê Nhà Oval Tự Nhiên & Brand Typography */}
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3.5 group shrink-0">
+            <div className="relative h-11 sm:h-13 w-auto shrink-0 flex items-center">
               <img
                 src="/logo-oval-transparent.png"
                 alt="Ẩm Thực Quê Nhà - Không Gian Ẩm Thực Việt"
-                className="h-11 sm:h-14 w-auto object-contain drop-shadow-xs"
+                className="h-11 sm:h-13 w-auto object-contain drop-shadow-xs transition-transform group-hover:scale-105"
               />
             </div>
-            <div>
-              <span className="block font-serif text-lg sm:text-2xl font-black tracking-tight text-[#8B1D24]">
+            <div className="whitespace-nowrap shrink-0">
+              <span className="block font-serif text-lg sm:text-xl lg:text-2xl font-black tracking-tight text-[#8B1D24] leading-tight">
                 ẨM THỰC QUÊ NHÀ
               </span>
-              <span className="block text-[8px] sm:text-[10px] tracking-widest text-[#C58940] font-bold uppercase -mt-0.5 sm:mt-0.5">
+              <span className="block text-[8px] sm:text-[9px] lg:text-[10px] tracking-widest text-[#C58940] font-bold uppercase mt-0.5">
                 Hệ Thống Tiệc & Phòng VIP • Từ 2010
               </span>
             </div>
           </Link>
 
           {/* Menu Điều Hướng Desktop */}
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-bold text-[#554A41] uppercase tracking-wide">
-            <a href="#branches" className="hover:text-[#8B1D24] transition-colors">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-xs font-bold text-[#554A41] uppercase tracking-wide shrink-0">
+            <a href="#branches" className="hover:text-[#8B1D24] transition-colors whitespace-nowrap">
               3 Chi Nhánh
             </a>
-            <a href="#set-menus" className="hover:text-[#8B1D24] transition-colors">
+            <a href="#set-menus" className="hover:text-[#8B1D24] transition-colors whitespace-nowrap">
               Set Menu Tiệc
             </a>
-            <a href="#custom-dishes" className="text-[#8B1D24] font-black hover:text-[#72161C] transition-colors flex items-center gap-1">
+            <a href="#custom-dishes" className="text-[#8B1D24] font-black hover:text-[#72161C] transition-colors flex items-center gap-1 whitespace-nowrap">
               <Sparkles className="w-3.5 h-3.5 text-[#C58940]" />
               <span>Thực Đơn Tự Chọn</span>
             </a>
-            <a href="#spaces" className="hover:text-[#8B1D24] transition-colors">
+            <a href="#spaces" className="hover:text-[#8B1D24] transition-colors whitespace-nowrap">
               Không Gian Quê Nhà
             </a>
-            <a href="#booking-form-section" className="text-[#8B1D24] hover:text-[#72161C] transition-colors">
+            <a href="#booking-form-section" className="text-[#8B1D24] hover:text-[#72161C] transition-colors whitespace-nowrap">
               Phiếu Đặt Tiệc
             </a>
           </nav>
 
           {/* Hotline & Nút Đặt Tiệc Nhanh */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
               href="tel:0938226166"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-[#FDF6EE] border border-[#C58940]/40 text-[#8B1D24] text-xs font-bold hover:bg-[#FBEAD6] transition-all"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-[#FDF6EE] border border-[#C58940]/40 text-[#8B1D24] text-xs font-bold hover:bg-[#FBEAD6] transition-all whitespace-nowrap"
             >
               <Phone className="w-3.5 h-3.5 text-[#C58940]" />
               <span>0938 226 166</span>
@@ -561,7 +561,7 @@ export default function LandingBanquetPage() {
               }}
               borderRadius="0.75rem"
               duration={2800}
-              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#8B1D24] to-[#72161C] text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#8B1D24] to-[#72161C] text-white font-bold text-xs flex items-center gap-1.5 shadow-md whitespace-nowrap"
             >
               <Calendar className="w-3.5 h-3.5 text-[#F6D38B]" />
               <span>Đặt Tiệc</span>
@@ -570,138 +570,196 @@ export default function LandingBanquetPage() {
         </div>
       </header>
 
-      {/* 3. HERO SECTION - THEATRICAL SPOTLIGHT & 3D CARD (ACETERNITY UI) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#72161C] via-[#5A1015] to-[#3D0A0E] text-white border-b-4 border-[#C58940]">
-        {/* Aceternity Spotlight Effect */}
+      {/* 3. HERO SECTION - CINEMATIC FULL-BLEED LIVING STAGE WITH SYNCHRONIZED CROSSFADE */}
+      <section className="relative overflow-hidden bg-[#170406] text-white border-b-4 border-[#C58940] min-h-[660px] sm:min-h-[720px] lg:min-h-[760px] flex items-center">
+        {/* Aceternity Spotlight Effect (Theatrical Ambient Glow) */}
         <Spotlight
-          className="-top-40 left-0 md:left-48 md:-top-20"
+          className="-top-40 left-0 md:left-48 md:-top-20 z-20 pointer-events-none"
           fill="#F6D38B"
         />
 
-        {/* Delicate golden geometric grid pattern */}
-        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#C58940_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none" />
+        {/* Delicate golden geometric grid pattern overlay */}
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#C58940_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none z-20" />
 
-        {/* Nút Chuyển Slide Trái / Phải */}
+        {/* 3 SLIDES RENDERED CONCURRENTLY FOR 100% SYNCHRONIZED BUTTER-SMOOTH DISSOLVE */}
+        {HERO_SLIDES.map((slide, idx) => {
+          const isActive = heroSlide === idx;
+          return (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
+                isActive
+                  ? 'opacity-100 scale-100 z-10 pointer-events-auto'
+                  : 'opacity-0 scale-105 z-0 pointer-events-none'
+              }`}
+            >
+              {/* Lớp Ảnh Nền Tràn Viền Toàn Cảnh (Full-bleed Photography) */}
+              <div className="absolute inset-0 overflow-hidden">
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  priority={idx === 0}
+                  className={`object-cover object-center transition-transform duration-[7000ms] ease-out ${
+                    isActive ? 'scale-105' : 'scale-100'
+                  }`}
+                />
+
+                {/* Mặt nạ màu nghệ thuật: Hòa quyện ảnh và chữ vào nhau thành một bức họa */}
+                {/* 1. Scrim màu rượu đỏ sẫm từ trái qua phải: Đảm bảo chữ đọc rõ 100% mà hình ảnh vẫn tỏa sáng */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#170406] via-[#1f0508]/90 via-40% md:via-45% to-[#170406]/35" />
+                {/* 2. Gradient từ trên xuống và từ dưới lên: Hòa viền êm ái */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#170406] via-transparent via-50% to-[#170406]/65" />
+                {/* 3. Lớp ánh sáng vàng ẩm thực: Tôn vẻ ngon miệng và sang trọng */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(197,137,64,0.18),transparent_65%)] pointer-events-none" />
+              </div>
+
+              {/* Nội dung Nghệ Thuật: Chữ và Dữ Liệu Tự Nhiên Hòa Trong Không Gian */}
+              <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center py-16 sm:py-20 lg:py-24">
+                <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                  {/* Cột Trái: Tiêu Đề Tinh Hoa & Thông Điệp Bếp Trưởng (7/12) */}
+                  <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#C58940]/60 text-[#F6D38B] text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-lg">
+                      <Sparkles className="w-3.5 h-3.5 text-[#F6D38B] animate-pulse" />
+                      <span>{slide.tag}</span>
+                    </div>
+
+                    <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] text-white drop-shadow-xl">
+                      {slide.title} <br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F6D38B] via-[#FFE29F] to-[#E6B357] italic">
+                        {slide.highlight}
+                      </span>
+                    </h1>
+
+                    <p className="text-xs sm:text-base text-amber-50/90 leading-relaxed max-w-xl font-light mx-auto lg:mx-0 drop-shadow-sm">
+                      {slide.desc}
+                    </p>
+
+                    {/* 2 Nút Hành Động Sang Trọng */}
+                    <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                      <MovingBorderButton
+                        onClick={() => {
+                          const el = document.getElementById('booking-form-section');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        borderRadius="0.875rem"
+                        duration={3200}
+                        className="px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#8B1D24] via-[#72161C] to-[#8B1D24] text-[#F6D38B] font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2.5 shadow-2xl"
+                      >
+                        <Calendar className="w-4 h-4 text-[#F6D38B]" />
+                        <span>Đặt Bàn & Giữ Phòng VIP Ngay</span>
+                        <ArrowRight className="w-4 h-4 text-[#F6D38B]" />
+                      </MovingBorderButton>
+
+                      <a
+                        href="#custom-dishes"
+                        className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 hover:border-[#C58940]/60 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 group shadow-lg"
+                      >
+                        <UtensilsCrossed className="w-4 h-4 text-[#F6D38B] group-hover:rotate-12 transition-transform" />
+                        <span>Khám Phá Món Ngon</span>
+                      </a>
+                    </div>
+
+                    {/* 4 Thước Đo Uy Tín Hoà Vào Nền Rượu Vang */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-5 sm:pt-6 border-t border-white/15 text-center">
+                      {slide.stats.map((st, i) => (
+                        <div key={i} className="bg-black/30 backdrop-blur-xs p-2.5 sm:p-2 rounded-xl border border-white/10">
+                          <div className="font-serif text-xl sm:text-3xl font-black text-[#F6D38B]">{st.value}</div>
+                          <div className="text-[10px] sm:text-[11px] text-amber-200/80 uppercase font-medium mt-0.5 tracking-wider">{st.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Cột Phải: Thẻ Bảo Chứng Mỹ Vị Bay Bổng Nghệ Thuật (5/12) */}
+                  <div className="hidden lg:flex flex-col items-end justify-center">
+                    <div className="w-full max-w-sm rounded-3xl bg-black/45 backdrop-blur-xl border border-[#C58940]/50 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative overflow-hidden group hover:border-[#F6D38B] transition-all duration-300">
+                      {/* Ánh sáng kim loại góc thẻ */}
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#C58940]/30 to-transparent rounded-bl-full pointer-events-none" />
+
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="px-3 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-[11px] uppercase tracking-wider border border-[#C58940]/60 shadow-md">
+                          {slide.badge}
+                        </span>
+                        <div className="flex items-center gap-1 text-[#F6D38B] text-xs font-black ml-auto">
+                          <Star className="w-3.5 h-3.5 fill-[#F6D38B]" />
+                          <span>5.0</span>
+                        </div>
+                      </div>
+
+                      <h3 className="font-serif text-xl font-black text-white group-hover:text-[#F6D38B] transition-colors leading-snug">
+                        {slide.dishHighlight}
+                      </h3>
+
+                      <p className="text-xs text-amber-100/80 mt-2.5 font-light leading-relaxed">
+                        Tuyển chọn tươi sống nguyên con mỗi sớm. Chế biến theo công thức gia truyền Nam Bộ, gìn giữ phong vị tinh tế đãi khách quý.
+                      </p>
+
+                      <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-xs">
+                        <span className="text-amber-200/90 flex items-center gap-1.5 font-medium">
+                          <ChefHat className="w-4 h-4 text-[#F6D38B]" />
+                          Bếp Trưởng 20+ Năm
+                        </span>
+                        <button
+                          onClick={() => {
+                            const el = document.getElementById('booking-form-section');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="text-[#F6D38B] font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          Giữ bàn tiệc <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Nút Chuyển Slide Trái / Phải Kiểu Glassmorphism */}
         <button
           onClick={prevSlide}
           aria-label="Slide trước"
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-lg backdrop-blur-xs cursor-pointer"
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-xl backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95"
         >
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <button
           onClick={nextSlide}
           aria-label="Slide tiếp theo"
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-lg backdrop-blur-xs cursor-pointer"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-xl backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95"
         >
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
-        {/* Nội dung Slide */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Cột Trái: Tiêu Đề Nghệ Thuật & Thông Điệp */}
-            <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left transition-all duration-500">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C58940]/60 text-amber-200 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-[#F6D38B] animate-pulse" />
-                <span>{activeSlideData.tag}</span>
-              </div>
-
-              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-md">
-                {activeSlideData.title} <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F6D38B] via-[#FFE29F] to-[#E6B357] italic">
-                  {activeSlideData.highlight}
-                </span>
-              </h1>
-
-              <p className="text-xs sm:text-base text-amber-50/90 leading-relaxed max-w-2xl font-light mx-auto lg:mx-0">
-                {activeSlideData.desc}
-              </p>
-
-              {/* 2 Nút Hành Động: Moving Border Button + Khám Phá */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                <MovingBorderButton
-                  onClick={() => {
-                    const el = document.getElementById('booking-form-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  borderRadius="0.875rem"
-                  duration={3200}
-                  className="px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#8B1D24] via-[#72161C] to-[#8B1D24] text-[#F6D38B] font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2.5 shadow-2xl"
-                >
-                  <Calendar className="w-4 h-4 text-[#F6D38B]" />
-                  <span>Đặt Bàn & Giữ Phòng VIP Ngay</span>
-                  <ArrowRight className="w-4 h-4 text-[#F6D38B]" />
-                </MovingBorderButton>
-
-                <a
-                  href="#custom-dishes"
-                  className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 hover:border-[#C58940]/60 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 group"
-                >
-                  <UtensilsCrossed className="w-4 h-4 text-[#F6D38B] group-hover:rotate-12 transition-transform" />
-                  <span>Khám Phá Món Ngon</span>
-                </a>
-              </div>
-
-              {/* 4 Thước Đo Uy Tín */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-5 sm:pt-7 border-t border-white/15 text-center">
-                {activeSlideData.stats.map((st, i) => (
-                  <div key={i} className="bg-white/5 sm:bg-white/[0.03] p-2.5 sm:p-2 rounded-xl backdrop-blur-xs border border-white/5">
-                    <div className="font-serif text-xl sm:text-3xl font-black text-[#F6D38B]">{st.value}</div>
-                    <div className="text-[10px] sm:text-[11px] text-amber-200/80 uppercase font-medium mt-0.5 tracking-wider">{st.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Cột Phải: Aceternity 3D Card Tilt Cho Món Ăn Nổi Bật */}
-            <div className="lg:col-span-5 relative flex justify-center">
-              <CardContainer className="inter-var w-full max-w-sm sm:max-w-md" containerClassName="py-0">
-                <CardBody className="relative rounded-3xl overflow-hidden p-3 bg-gradient-to-b from-[#C58940]/50 via-white/5 to-[#C58940]/20 border-2 border-[#C58940]/70 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] backdrop-blur-md group">
-                  <CardItem translateZ="75" className="relative h-72 sm:h-96 w-full rounded-2xl overflow-hidden bg-stone-900 shadow-inner">
-                    <Image
-                      src={activeSlideData.image}
-                      alt={activeSlideData.dishHighlight}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent pointer-events-none" />
-                    
-                    <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white pointer-events-none">
-                      <CardItem translateZ="90" as="div">
-                        <span className="px-2.5 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-[10px] sm:text-xs uppercase tracking-wider border border-[#C58940]/60 shadow-lg">
-                          {activeSlideData.badge}
-                        </span>
-                      </CardItem>
-                      <CardItem translateZ="110" as="h3" className="font-serif text-base sm:text-xl font-bold mt-2 text-amber-100 drop-shadow-md">
-                        {activeSlideData.dishHighlight}
-                      </CardItem>
-                      <CardItem translateZ="60" as="p" className="text-[11px] sm:text-xs text-amber-200/90 mt-1 line-clamp-2 font-light">
-                        Nguyên liệu tươi sống tuyển chọn trong ngày, giữ trọn vị quê mộc mạc Nam Bộ.
-                      </CardItem>
-                    </div>
-                  </CardItem>
-                </CardBody>
-              </CardContainer>
-            </div>
-          </div>
-
-          {/* 3 Vạch Điều Khiển Slide Dưới Đáy Hero */}
-          <div className="flex items-center justify-center gap-2.5 mt-8 sm:mt-12">
-            {HERO_SLIDES.map((slide, idx) => (
+        {/* Bảng Điều Khiển Tiến Trình Slide Sang Trọng Dưới Đáy Hero */}
+        <div className="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 sm:gap-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl">
+          {HERO_SLIDES.map((slide, idx) => {
+            const isCurrent = heroSlide === idx;
+            return (
               <button
                 key={slide.id}
                 onClick={() => setHeroSlide(idx)}
-                aria-label={`Chuyển đến slide ${idx + 1}`}
-                className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  heroSlide === idx
-                    ? 'w-8 sm:w-10 bg-[#C58940] shadow-md shadow-[#C58940]/50'
-                    : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
-                }`}
-              />
-            ))}
-          </div>
+                aria-label={`Chuyển đến cảnh ${idx + 1}`}
+                className="group flex items-center gap-2 cursor-pointer focus:outline-hidden"
+              >
+                <span className={`text-[10px] sm:text-xs font-mono font-bold transition-colors ${
+                  isCurrent ? 'text-[#F6D38B]' : 'text-white/50 group-hover:text-white/80'
+                }`}>
+                  0{idx + 1}
+                </span>
+                <span
+                  className={`h-1 sm:h-1.5 rounded-full transition-all duration-500 ${
+                    isCurrent
+                      ? 'w-8 sm:w-12 bg-gradient-to-r from-[#C58940] to-[#F6D38B] shadow-md shadow-[#C58940]/50'
+                      : 'w-3 sm:w-4 bg-white/30 group-hover:bg-white/60'
+                  }`}
+                />
+              </button>
+            );
+          })}
         </div>
       </section>
 
