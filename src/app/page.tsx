@@ -571,68 +571,48 @@ export default function LandingBanquetPage() {
         </div>
       </header>
 
-      {/* 3. HERO SECTION - CINEMATIC FULL-BLEED LIVING STAGE WITH SYNCHRONIZED CROSSFADE */}
-      <section className="relative overflow-hidden bg-[#170406] text-white border-b-4 border-[#C58940] min-h-[660px] sm:min-h-[720px] lg:min-h-[760px] flex items-center">
-        {/* Aceternity Spotlight Effect (Theatrical Ambient Glow) */}
+      {/* 3. HERO SECTION - LUXURY WARMTH & BUTTER-SMOOTH SYNCHRONIZED SLIDER */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#8C1B23] via-[#A0232B] to-[#78141B] text-white border-b-4 border-[#C58940] min-h-[660px] sm:min-h-[720px] lg:min-h-[740px] flex items-center">
+        {/* Aceternity Spotlight Effect (Warm Theatrical Golden Glow) */}
         <Spotlight
           className="-top-40 left-0 md:left-48 md:-top-20 z-20 pointer-events-none"
-          fill="#F6D38B"
+          fill="#FFE29F"
         />
 
-        {/* Delicate golden geometric grid pattern overlay */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#C58940_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none z-20" />
+        {/* Ánh sáng vàng ẩm thực rực rỡ và ấm cúng (Không bị tối) */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(255,226,159,0.25),transparent_50%)] pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_75%,rgba(246,211,139,0.22),transparent_45%)] pointer-events-none z-10" />
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#F6D38B_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none z-10" />
 
-        {/* 3 SLIDES RENDERED CONCURRENTLY FOR 100% SYNCHRONIZED BUTTER-SMOOTH DISSOLVE */}
+        {/* 3 SLIDES RENDERED WITH PURE GPU-ACCELERATED OPACITY (100% BUTTER-SMOOTH, KHÔNG GIỰT) */}
         {HERO_SLIDES.map((slide, idx) => {
           const isActive = heroSlide === idx;
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
+              className={`absolute inset-0 w-full h-full flex items-center transition-opacity duration-600 ease-in-out ${
                 isActive
-                  ? 'opacity-100 scale-100 z-10 pointer-events-auto'
-                  : 'opacity-0 scale-105 z-0 pointer-events-none'
+                  ? 'opacity-100 z-10 pointer-events-auto'
+                  : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
-              {/* Lớp Ảnh Nền Tràn Viền Toàn Cảnh (Full-bleed Photography) */}
-              <div className="absolute inset-0 overflow-hidden">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  priority={idx === 0}
-                  className={`object-cover object-center transition-transform duration-[7000ms] ease-out ${
-                    isActive ? 'scale-105' : 'scale-100'
-                  }`}
-                />
-
-                {/* Mặt nạ màu nghệ thuật: Hòa quyện ảnh và chữ vào nhau thành một bức họa */}
-                {/* 1. Scrim màu rượu đỏ sẫm từ trái qua phải: Đảm bảo chữ đọc rõ 100% mà hình ảnh vẫn tỏa sáng */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#170406] via-[#1f0508]/90 via-40% md:via-45% to-[#170406]/35" />
-                {/* 2. Gradient từ trên xuống và từ dưới lên: Hòa viền êm ái */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#170406] via-transparent via-50% to-[#170406]/65" />
-                {/* 3. Lớp ánh sáng vàng ẩm thực: Tôn vẻ ngon miệng và sang trọng */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(197,137,64,0.18),transparent_65%)] pointer-events-none" />
-              </div>
-
-              {/* Nội dung Nghệ Thuật: Chữ và Dữ Liệu Tự Nhiên Hòa Trong Không Gian */}
-              <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center py-16 sm:py-20 lg:py-24">
-                <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                   {/* Cột Trái: Tiêu Đề Tinh Hoa & Thông Điệp Bếp Trưởng (7/12) */}
                   <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#C58940]/60 text-[#F6D38B] text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-lg">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-[#F6D38B]/50 text-amber-200 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-md">
                       <Sparkles className="w-3.5 h-3.5 text-[#F6D38B] animate-pulse" />
                       <span>{slide.tag}</span>
                     </div>
 
-                    <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] text-white drop-shadow-xl">
+                    <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] text-white drop-shadow-md">
                       {slide.title} <br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F6D38B] via-[#FFE29F] to-[#E6B357] italic">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F6D38B] via-[#FFF3D1] to-[#E6B357] italic">
                         {slide.highlight}
                       </span>
                     </h1>
 
-                    <p className="text-xs sm:text-base text-amber-50/90 leading-relaxed max-w-xl font-light mx-auto lg:mx-0 drop-shadow-sm">
+                    <p className="text-xs sm:text-base text-amber-50/95 leading-relaxed max-w-xl font-light mx-auto lg:mx-0 drop-shadow-xs">
                       {slide.desc}
                     </p>
 
@@ -654,61 +634,70 @@ export default function LandingBanquetPage() {
 
                       <a
                         href="#custom-dishes"
-                        className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 hover:border-[#C58940]/60 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 group shadow-lg"
+                        className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 hover:border-[#F6D38B]/80 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 group shadow-md"
                       >
                         <UtensilsCrossed className="w-4 h-4 text-[#F6D38B] group-hover:rotate-12 transition-transform" />
                         <span>Khám Phá Món Ngon</span>
                       </a>
                     </div>
 
-                    {/* 4 Thước Đo Uy Tín Hoà Vào Nền Rượu Vang */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-5 sm:pt-6 border-t border-white/15 text-center">
+                    {/* 4 Thước Đo Uy Tín Hoà Vào Nền Rượu Vang Ấm Cúng */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-5 sm:pt-6 border-t border-white/20 text-center">
                       {slide.stats.map((st, i) => (
-                        <div key={i} className="bg-black/30 backdrop-blur-xs p-2.5 sm:p-2 rounded-xl border border-white/10">
+                        <div key={i} className="bg-white/10 backdrop-blur-xs p-2.5 sm:p-2 rounded-xl border border-white/10 shadow-xs">
                           <div className="font-serif text-xl sm:text-3xl font-black text-[#F6D38B]">{st.value}</div>
-                          <div className="text-[10px] sm:text-[11px] text-amber-200/80 uppercase font-medium mt-0.5 tracking-wider">{st.label}</div>
+                          <div className="text-[10px] sm:text-[11px] text-amber-100 uppercase font-medium mt-0.5 tracking-wider">{st.label}</div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Cột Phải: Thẻ Bảo Chứng Mỹ Vị Bay Bổng Nghệ Thuật (5/12) */}
-                  <div className="hidden lg:flex flex-col items-end justify-center">
-                    <div className="w-full max-w-sm rounded-3xl bg-black/45 backdrop-blur-xl border border-[#C58940]/50 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative overflow-hidden group hover:border-[#F6D38B] transition-all duration-300">
-                      {/* Ánh sáng kim loại góc thẻ */}
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#C58940]/30 to-transparent rounded-bl-full pointer-events-none" />
+                  {/* Cột Phải: Thẻ Tâm Điểm Món Ăn & Không Gian (5/12 CỘT CHUẨN XÁC, KHÔNG BỊ ÉP HẸP) */}
+                  <div className="hidden lg:flex lg:col-span-5 flex-col items-center lg:items-end justify-center w-full">
+                    <div className="w-full max-w-sm xl:max-w-md rounded-3xl bg-black/30 backdrop-blur-md border border-[#F6D38B]/50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] p-3 sm:p-4 group">
+                      {/* Khung ảnh tươi ngon, sáng sủa, sắc nét */}
+                      <div className="relative h-64 xl:h-72 w-full rounded-2xl overflow-hidden shadow-inner bg-[#600E13]">
+                        <Image
+                          src={slide.image}
+                          alt={slide.dishHighlight}
+                          fill
+                          priority={idx === 0}
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="px-3 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-[11px] uppercase tracking-wider border border-[#C58940]/60 shadow-md">
-                          {slide.badge}
-                        </span>
-                        <div className="flex items-center gap-1 text-[#F6D38B] text-xs font-black ml-auto">
-                          <Star className="w-3.5 h-3.5 fill-[#F6D38B]" />
-                          <span>5.0</span>
+                        <div className="absolute top-3 left-3">
+                          <span className="px-3 py-1 rounded-full bg-[#8B1D24] text-[#F6D38B] font-bold text-xs uppercase tracking-wider border border-[#C58940]/60 shadow-lg">
+                            {slide.badge}
+                          </span>
+                        </div>
+
+                        <div className="absolute bottom-3 left-3 right-3 text-white">
+                          <div className="flex items-center gap-1 text-[#F6D38B] text-xs font-bold mb-1">
+                            <Star className="w-3.5 h-3.5 fill-[#F6D38B]" />
+                            <span>5.0 • Tuyển Chọn Tươi Sống Trong Ngày</span>
+                          </div>
+                          <h3 className="font-serif text-lg xl:text-xl font-bold text-white drop-shadow-md leading-tight">
+                            {slide.dishHighlight}
+                          </h3>
                         </div>
                       </div>
 
-                      <h3 className="font-serif text-xl font-black text-white group-hover:text-[#F6D38B] transition-colors leading-snug">
-                        {slide.dishHighlight}
-                      </h3>
-
-                      <p className="text-xs text-amber-100/80 mt-2.5 font-light leading-relaxed">
-                        Tuyển chọn tươi sống nguyên con mỗi sớm. Chế biến theo công thức gia truyền Nam Bộ, gìn giữ phong vị tinh tế đãi khách quý.
-                      </p>
-
-                      <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-xs">
-                        <span className="text-amber-200/90 flex items-center gap-1.5 font-medium">
+                      {/* Chân Thẻ: Cam Kết Bếp Trưởng & Nút Giữ Bàn */}
+                      <div className="p-2 sm:p-3 pt-3 flex items-center justify-between text-xs">
+                        <span className="text-amber-100 flex items-center gap-1.5 font-medium">
                           <ChefHat className="w-4 h-4 text-[#F6D38B]" />
-                          Bếp Trưởng 20+ Năm
+                          <span>Bếp Trưởng 20+ Năm</span>
                         </span>
                         <button
                           onClick={() => {
                             const el = document.getElementById('booking-form-section');
                             if (el) el.scrollIntoView({ behavior: 'smooth' });
                           }}
-                          className="text-[#F6D38B] font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-[#F6D38B] text-[#72161C] font-black text-xs hover:bg-white transition-all shadow-md cursor-pointer flex items-center gap-1"
                         >
-                          Giữ bàn tiệc <ArrowRight className="w-3.5 h-3.5" />
+                          <span>Giữ Bàn Tiệc</span>
+                          <ArrowRight className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
@@ -723,14 +712,14 @@ export default function LandingBanquetPage() {
         <button
           onClick={prevSlide}
           aria-label="Slide trước"
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-xl backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95"
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-xl backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95"
         >
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <button
           onClick={nextSlide}
           aria-label="Slide tiếp theo"
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-xl backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#8B1D24] text-white/90 hover:text-white border border-[#C58940]/60 flex items-center justify-center transition-all shadow-xl backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95"
         >
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
